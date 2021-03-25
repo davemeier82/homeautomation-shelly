@@ -14,45 +14,43 @@
  * limitations under the License.
  */
 
-package com.github.davemeier82.homeautomation.shelly;
+package com.github.davemeier82.homeautomation.shelly.device;
 
-import com.github.davemeier82.homeautomation.core.device.mqtt.MqttMultiRelay;
-import com.github.davemeier82.homeautomation.core.event.DataWithTimestamp;
+import com.github.davemeier82.homeautomation.core.device.mqtt.MqttSubscriber;
+import com.github.davemeier82.homeautomation.core.device.property.DeviceProperty;
 import com.github.davemeier82.homeautomation.core.event.EventFactory;
 import com.github.davemeier82.homeautomation.core.event.EventPublisher;
 import com.github.davemeier82.homeautomation.core.mqtt.MqttClient;
+import com.github.davemeier82.homeautomation.shelly.device.property.ShellyRelay;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.nio.ByteBuffer;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicReference;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
-public class Shelly25 implements MqttMultiRelay {
+public class Shelly25 implements MqttSubscriber {
 
-  private static final Logger log = LoggerFactory.getLogger(Shelly1.class);
+  private static final Logger log = LoggerFactory.getLogger(Shelly25.class);
   public static final String PREFIX = "shellyswitch25-";
   private static final String MQTT_TOPIC = "shellies/" + PREFIX;
   public static final String TYPE = "shellies/shelly25";
 
   private final String id;
-  private final MqttClient mqttClient;
-  private final EventPublisher eventPublisher;
-  private final EventFactory eventFactory;
   private final String baseTopic;
-  private final List<AtomicReference<DataWithTimestamp<Boolean>>> isOn = List.of(new AtomicReference<>(), new AtomicReference<>());
+  private final List<ShellyRelay> relays;
   private String displayName;
 
   public Shelly25(String id, String displayName, MqttClient mqttClient, EventPublisher eventPublisher, EventFactory eventFactory) {
     this.id = id;
     this.displayName = displayName;
-    this.mqttClient = mqttClient;
-    this.eventPublisher = eventPublisher;
-    this.eventFactory = eventFactory;
     baseTopic = MQTT_TOPIC + id + "/";
+    relays = List.of(
+        new ShellyRelay(0, this, getCommandTopic(0), eventPublisher, eventFactory, mqttClient),
+        new ShellyRelay(1, this, getCommandTopic(1), eventPublisher, eventFactory, mqttClient)
+    );
   }
 
   @Override
@@ -76,18 +74,9 @@ public class Shelly25 implements MqttMultiRelay {
 
   private void changeStateOfRelay(int relayIndex, String message) {
     if ("off".equalsIgnoreCase(message)) {
-      setRelayStateTo(relayIndex, false);
+      relays.get(relayIndex).setRelayStateTo(false);
     } else if ("on".equalsIgnoreCase(message)) {
-      setRelayStateTo(relayIndex, true);
-    }
-  }
-
-  private void setRelayStateTo(int relayIndex, boolean on) {
-    AtomicReference<DataWithTimestamp<Boolean>> relayState = isOn.get(relayIndex);
-    if (relayState.get() == null || relayState.get().getValue() != on) {
-      DataWithTimestamp<Boolean> newValue = new DataWithTimestamp<>(on);
-      isOn.get(relayIndex).set(newValue);
-      eventPublisher.publishEvent(eventFactory.createMultiRelayStateChangedEvent(this, relayIndex, newValue));
+      relays.get(relayIndex).setRelayStateTo(true);
     }
   }
 
@@ -99,21 +88,6 @@ public class Shelly25 implements MqttMultiRelay {
   @Override
   public String getId() {
     return id;
-  }
-
-  @Override
-  public void turnOn(int relayIndex) {
-    mqttClient.publish(getCommandTopic(relayIndex), "on");
-  }
-
-  @Override
-  public void turnOff(int relayIndex) {
-    mqttClient.publish(getCommandTopic(relayIndex), "off");
-  }
-
-  @Override
-  public Optional<DataWithTimestamp<Boolean>> isOn(int relayIndex) {
-    return Optional.ofNullable(isOn.get(relayIndex).get());
   }
 
   private String getCommandTopic(int relayIndex) {
@@ -132,5 +106,10 @@ public class Shelly25 implements MqttMultiRelay {
   @Override
   public void setDisplayName(String displayName) {
     this.displayName = displayName;
+  }
+
+  @Override
+  public List<? extends DeviceProperty> getDeviceProperties() {
+    return List.copyOf(relays);
   }
 }

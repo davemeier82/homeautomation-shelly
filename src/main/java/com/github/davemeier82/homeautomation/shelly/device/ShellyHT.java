@@ -14,44 +14,47 @@
  * limitations under the License.
  */
 
-package com.github.davemeier82.homeautomation.shelly;
+package com.github.davemeier82.homeautomation.shelly.device;
 
-import com.github.davemeier82.homeautomation.core.device.BatteryStateSensor;
-import com.github.davemeier82.homeautomation.core.device.mqtt.MqttHumiditySensor;
-import com.github.davemeier82.homeautomation.core.device.mqtt.MqttTemperatureSensor;
-import com.github.davemeier82.homeautomation.core.event.DataWithTimestamp;
+import com.github.davemeier82.homeautomation.core.device.mqtt.MqttSubscriber;
+import com.github.davemeier82.homeautomation.core.device.property.DeviceProperty;
 import com.github.davemeier82.homeautomation.core.event.EventFactory;
 import com.github.davemeier82.homeautomation.core.event.EventPublisher;
+import com.github.davemeier82.homeautomation.shelly.device.property.ShellyBatteryStateSensor;
+import com.github.davemeier82.homeautomation.shelly.device.property.ShellyHumiditySensor;
+import com.github.davemeier82.homeautomation.shelly.device.property.ShellyTemperatureSensor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.nio.ByteBuffer;
+import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicReference;
 
+import static java.lang.Float.parseFloat;
+import static java.lang.Integer.parseInt;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
-public class ShellyHT implements MqttTemperatureSensor, MqttHumiditySensor, BatteryStateSensor {
+public class ShellyHT implements MqttSubscriber {
   private static final Logger log = LoggerFactory.getLogger(ShellyHT.class);
   public static final String PREFIX = "shellyht-";
   private static final String MQTT_TOPIC = "shellies/" + PREFIX;
   public static final String TYPE = "shellies/shellyht";
 
   private final String id;
-  private final EventPublisher eventPublisher;
-  private final EventFactory eventFactory;
   private final String baseTopic;
-  private final AtomicReference<DataWithTimestamp<Float>> temperature = new AtomicReference<>();
-  private final AtomicReference<DataWithTimestamp<Float>> humidity = new AtomicReference<>();
-  private final AtomicReference<DataWithTimestamp<Integer>> batteryLevel = new AtomicReference<>();
   private String displayName;
+
+  private final ShellyBatteryStateSensor batteryStateSensor;
+  private final ShellyHumiditySensor humiditySensor;
+  private final ShellyTemperatureSensor temperatureSensor;
 
   public ShellyHT(String id, String displayName, EventPublisher eventPublisher, EventFactory eventFactory) {
     this.id = id;
     this.displayName = displayName;
-    this.eventPublisher = eventPublisher;
-    this.eventFactory = eventFactory;
     baseTopic = MQTT_TOPIC + id + "/sensor/";
+    temperatureSensor = new ShellyTemperatureSensor(0, this, eventPublisher, eventFactory);
+    humiditySensor = new ShellyHumiditySensor(1, this, eventPublisher, eventFactory);
+    batteryStateSensor = new ShellyBatteryStateSensor(2, this, eventPublisher, eventFactory);
   }
 
   @Override
@@ -65,17 +68,11 @@ public class ShellyHT implements MqttTemperatureSensor, MqttHumiditySensor, Batt
       String message = UTF_8.decode(byteBuffer).toString();
       log.debug("{}: {}", topic, message);
       if (topic.endsWith("/temperature")) {
-        DataWithTimestamp<Float> newValue = new DataWithTimestamp<>(Float.valueOf(message));
-        temperature.set(newValue);
-        eventPublisher.publishEvent(eventFactory.createTemperatureChangedEvent(this, newValue));
+        temperatureSensor.setTemperatureInDegree(parseFloat(message));
       } else if (topic.endsWith("/humidity")) {
-        DataWithTimestamp<Float> newValue = new DataWithTimestamp<>(Float.valueOf(message));
-        humidity.set(newValue);
-        eventPublisher.publishEvent(eventFactory.createHumidityChangedEvent(this, newValue));
+        humiditySensor.setRelativeHumidityInPercent(parseFloat(message));
       } else if (topic.endsWith("/battery")) {
-        DataWithTimestamp<Integer> newValue = new DataWithTimestamp<>(Integer.valueOf(message));
-        batteryLevel.set(newValue);
-        eventPublisher.publishEvent(eventFactory.createBatteryLevelChangedEvent(this, newValue));
+        batteryStateSensor.setBatteryLevel(parseInt(message));
       }
     });
   }
@@ -91,21 +88,6 @@ public class ShellyHT implements MqttTemperatureSensor, MqttHumiditySensor, Batt
   }
 
   @Override
-  public Optional<DataWithTimestamp<Float>> getRelativeHumidityInPercent() {
-    return Optional.ofNullable(humidity.get());
-  }
-
-  @Override
-  public Optional<DataWithTimestamp<Float>> getTemperatureInDegree() {
-    return Optional.ofNullable(temperature.get());
-  }
-
-  @Override
-  public Optional<DataWithTimestamp<Integer>> batteryLevelInPercent() {
-    return Optional.ofNullable(batteryLevel.get());
-  }
-
-  @Override
   public String getDisplayName() {
     return displayName;
   }
@@ -113,5 +95,10 @@ public class ShellyHT implements MqttTemperatureSensor, MqttHumiditySensor, Batt
   @Override
   public void setDisplayName(String displayName) {
     this.displayName = displayName;
+  }
+
+  @Override
+  public List<DeviceProperty> getDeviceProperties() {
+    return List.of(temperatureSensor, humiditySensor, batteryStateSensor);
   }
 }

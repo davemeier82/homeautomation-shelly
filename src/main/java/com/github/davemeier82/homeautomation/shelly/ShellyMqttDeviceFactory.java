@@ -23,6 +23,7 @@ import com.github.davemeier82.homeautomation.core.device.mqtt.MqttSubscriber;
 import com.github.davemeier82.homeautomation.core.event.EventFactory;
 import com.github.davemeier82.homeautomation.core.event.EventPublisher;
 import com.github.davemeier82.homeautomation.core.mqtt.MqttClient;
+import com.github.davemeier82.homeautomation.shelly.device.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -108,6 +109,7 @@ public class ShellyMqttDeviceFactory implements MqttDeviceFactory {
     } else {
       throw new IllegalArgumentException("device type '" + type + "' not supported");
     }
+    mqttClient.subscribe(device.getTopic(), device::processMessage);
     eventPublisher.publishEvent(eventFactory.createNewDeviceCreatedEvent(device));
     return device;
   }

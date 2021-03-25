@@ -14,43 +14,39 @@
  * limitations under the License.
  */
 
-package com.github.davemeier82.homeautomation.shelly;
+package com.github.davemeier82.homeautomation.shelly.device;
 
-import com.github.davemeier82.homeautomation.core.device.mqtt.MqttRelay;
-import com.github.davemeier82.homeautomation.core.event.DataWithTimestamp;
+import com.github.davemeier82.homeautomation.core.device.mqtt.MqttSubscriber;
+import com.github.davemeier82.homeautomation.core.device.property.DeviceProperty;
 import com.github.davemeier82.homeautomation.core.event.EventFactory;
 import com.github.davemeier82.homeautomation.core.event.EventPublisher;
 import com.github.davemeier82.homeautomation.core.mqtt.MqttClient;
+import com.github.davemeier82.homeautomation.shelly.device.property.ShellyRelay;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.nio.ByteBuffer;
+import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicReference;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
-public class Shelly1 implements MqttRelay {
+public class Shelly1 implements MqttSubscriber {
   private static final Logger log = LoggerFactory.getLogger(Shelly1.class);
   public static final String PREFIX = "shelly1-";
   private static final String MQTT_TOPIC = "shellies/" + PREFIX;
   public static final String TYPE = "shellies/shelly1";
 
   private final String id;
-  private final MqttClient mqttClient;
-  private final EventPublisher eventPublisher;
-  private final EventFactory eventFactory;
   private final String baseTopic;
-  private final AtomicReference<DataWithTimestamp<Boolean>> isOn = new AtomicReference<>();
+  private final ShellyRelay relay;
   private String displayName;
 
   public Shelly1(String id, String displayName, MqttClient mqttClient, EventPublisher eventPublisher, EventFactory eventFactory) {
     this.id = id;
     this.displayName = displayName;
-    this.mqttClient = mqttClient;
-    this.eventPublisher = eventPublisher;
-    this.eventFactory = eventFactory;
     baseTopic = MQTT_TOPIC + id + "/";
+    relay = new ShellyRelay(0, this, getCommandTopic(), eventPublisher, eventFactory, mqttClient);
   }
 
   @Override
@@ -68,21 +64,6 @@ public class Shelly1 implements MqttRelay {
     return baseTopic + "#";
   }
 
-  @Override
-  public void turnOn() {
-    mqttClient.publish(getCommandTopic(), "on");
-  }
-
-  @Override
-  public void turnOff() {
-    mqttClient.publish(getCommandTopic(), "off");
-  }
-
-  @Override
-  public Optional<DataWithTimestamp<Boolean>> isOn() {
-    return Optional.ofNullable(isOn.get());
-  }
-
   private String getCommandTopic() {
     return getRelayTopic() + "/command";
   }
@@ -98,20 +79,12 @@ public class Shelly1 implements MqttRelay {
       log.debug("{}: {}", topic, message);
       if (topic.equals(getRelayTopic())) {
         if ("off".equalsIgnoreCase(message)) {
-          setRelayStateTo(false);
+          relay.setRelayStateTo(false);
         } else if ("on".equalsIgnoreCase(message)) {
-          setRelayStateTo(true);
+          relay.setRelayStateTo(true);
         }
       }
     });
-  }
-
-  private void setRelayStateTo(boolean on) {
-    if (isOn.get() == null || isOn.get().getValue() != on) {
-      DataWithTimestamp<Boolean> newValue = new DataWithTimestamp<>(on);
-      isOn.set(newValue);
-      eventPublisher.publishEvent(eventFactory.createRelayStateChangedEvent(this, newValue));
-    }
   }
 
   @Override
@@ -122,5 +95,10 @@ public class Shelly1 implements MqttRelay {
   @Override
   public void setDisplayName(String displayName) {
     this.displayName = displayName;
+  }
+
+  @Override
+  public List<DeviceProperty> getDeviceProperties() {
+    return List.of(relay);
   }
 }

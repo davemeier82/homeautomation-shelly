@@ -14,25 +14,25 @@
  * limitations under the License.
  */
 
-package com.github.davemeier82.homeautomation.shelly;
+package com.github.davemeier82.homeautomation.shelly.device;
 
-import com.github.davemeier82.homeautomation.core.device.BatteryStateSensor;
-import com.github.davemeier82.homeautomation.core.device.mqtt.MqttWindowSensor;
-import com.github.davemeier82.homeautomation.core.event.DataWithTimestamp;
+import com.github.davemeier82.homeautomation.core.device.mqtt.MqttSubscriber;
+import com.github.davemeier82.homeautomation.core.device.property.DeviceProperty;
 import com.github.davemeier82.homeautomation.core.event.EventFactory;
 import com.github.davemeier82.homeautomation.core.event.EventPublisher;
+import com.github.davemeier82.homeautomation.shelly.device.property.ShellyBatteryStateSensor;
+import com.github.davemeier82.homeautomation.shelly.device.property.ShellyWindowSensor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.nio.ByteBuffer;
-import java.time.ZonedDateTime;
+import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicReference;
 
 import static java.lang.Integer.parseInt;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
-public class ShellyDoorWindow implements MqttWindowSensor, BatteryStateSensor {
+public class ShellyDoorWindow implements MqttSubscriber {
   private static final Logger log = LoggerFactory.getLogger(ShellyDoorWindow.class);
   public static final String PREFIX = "shellydw-";
   private static final String MQTT_TOPIC = "shellies/" + PREFIX;
@@ -41,9 +41,8 @@ public class ShellyDoorWindow implements MqttWindowSensor, BatteryStateSensor {
   private final String id;
   private final EventPublisher eventPublisher;
   private final EventFactory eventFactory;
-  private final AtomicReference<DataWithTimestamp<Boolean>> isOpen = new AtomicReference<>();
-  private final AtomicReference<DataWithTimestamp<Integer>> tiltAngleInDegree = new AtomicReference<>();
-  private final AtomicReference<DataWithTimestamp<Integer>> batteryLevel = new AtomicReference<>();
+  private final ShellyBatteryStateSensor batteryStateSensor;
+  private final ShellyWindowSensor windowSensor;
   protected String baseTopic;
   private String displayName;
 
@@ -53,6 +52,8 @@ public class ShellyDoorWindow implements MqttWindowSensor, BatteryStateSensor {
     this.eventPublisher = eventPublisher;
     this.eventFactory = eventFactory;
     baseTopic = MQTT_TOPIC + id + "/sensor/";
+    batteryStateSensor = new ShellyBatteryStateSensor(0, this, eventPublisher, eventFactory);
+    windowSensor = new ShellyWindowSensor(1, this, eventPublisher, eventFactory);
   }
 
   @Override
@@ -77,53 +78,17 @@ public class ShellyDoorWindow implements MqttWindowSensor, BatteryStateSensor {
       log.debug("{}: {}", topic, message);
       if (topic.endsWith("/state")) {
         if (message.equals("open")) {
-          updateOpenState(true);
+          windowSensor.setIsOpen(true);
         } else if (message.equals("close")) {
-          updateOpenState(false);
+          windowSensor.setIsOpen(false);
         }
       } else if (topic.endsWith("/battery")) {
-        DataWithTimestamp<Integer> newValue = new DataWithTimestamp<>(Integer.valueOf(message));
-        batteryLevel.set(newValue);
-        eventPublisher.publishEvent(eventFactory.createBatteryLevelChangedEvent(this, newValue));
+        batteryStateSensor.setBatteryLevel(Integer.parseInt(message));
       }
       if (topic.endsWith("/tilt")) {
-        int angle = parseInt(message);
-        if (angle != -1) {
-          tiltAngleInDegree.set(new DataWithTimestamp<>(angle));
-        }
+        windowSensor.setTiltAngleInDegree(parseInt(message));
       }
     });
-  }
-
-  private void updateOpenState(boolean open) {
-    if (isOpen.get() == null || !isOpen.get().getValue().equals(open)) {
-      isOpen.set(new DataWithTimestamp<>(open));
-      if (open) {
-        eventPublisher.publishEvent(eventFactory.createWindowOpenedEvent(this, ZonedDateTime.now()));
-      } else {
-        eventPublisher.publishEvent(eventFactory.createWindowClosedEvent(this, ZonedDateTime.now()));
-      }
-    }
-  }
-
-  @Override
-  public Optional<DataWithTimestamp<Boolean>> isOpen() {
-    return Optional.ofNullable(isOpen.get());
-  }
-
-  @Override
-  public Optional<DataWithTimestamp<Integer>> getTiltAngleInDegree() {
-    return Optional.ofNullable(tiltAngleInDegree.get());
-  }
-
-  @Override
-  public boolean isTiltingSupported() {
-    return true;
-  }
-
-  @Override
-  public Optional<DataWithTimestamp<Integer>> batteryLevelInPercent() {
-    return Optional.ofNullable(batteryLevel.get());
   }
 
   @Override
@@ -134,5 +99,10 @@ public class ShellyDoorWindow implements MqttWindowSensor, BatteryStateSensor {
   @Override
   public void setDisplayName(String displayName) {
     this.displayName = displayName;
+  }
+
+  @Override
+  public List<? extends DeviceProperty> getDeviceProperties() {
+    return List.of(batteryStateSensor, windowSensor);
   }
 }
