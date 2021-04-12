@@ -36,7 +36,7 @@ public class ShellyDoorWindow implements MqttSubscriber {
   private static final Logger log = LoggerFactory.getLogger(ShellyDoorWindow.class);
   public static final String PREFIX = "shellydw-";
   private static final String MQTT_TOPIC = "shellies/" + PREFIX;
-  public static final String TYPE = "shellies/shelly-door-window";
+  public static final String TYPE = "shelly-door-window";
 
   private final String id;
   private final EventPublisher eventPublisher;

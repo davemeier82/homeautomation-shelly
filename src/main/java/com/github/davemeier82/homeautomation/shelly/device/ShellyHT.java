@@ -38,7 +38,7 @@ public class ShellyHT implements MqttSubscriber {
   private static final Logger log = LoggerFactory.getLogger(ShellyHT.class);
   public static final String PREFIX = "shellyht-";
   private static final String MQTT_TOPIC = "shellies/" + PREFIX;
-  public static final String TYPE = "shellies/shellyht";
+  public static final String TYPE = "shellyht";
 
   private final String id;
   private final String baseTopic;

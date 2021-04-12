@@ -22,7 +22,7 @@ import com.github.davemeier82.homeautomation.core.event.EventPublisher;
 public class ShellyDoorWindow2 extends ShellyDoorWindow {
   public static final String PREFIX = "shellydw2-";
   private static final String MQTT_TOPIC = "shellies/" + PREFIX;
-  public static final String TYPE = "shellies/shelly-door-window-2";
+  public static final String TYPE = "shelly-door-window-2";
 
   public ShellyDoorWindow2(String id, String displayName, EventPublisher eventPublisher, EventFactory eventFactory) {
     super(id, displayName, eventPublisher, eventFactory);
