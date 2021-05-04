@@ -39,8 +39,6 @@ public class ShellyDoorWindow implements MqttSubscriber {
   public static final String TYPE = "shelly-door-window";
 
   private final String id;
-  private final EventPublisher eventPublisher;
-  private final EventFactory eventFactory;
   private final ShellyBatteryStateSensor batteryStateSensor;
   private final ShellyWindowSensor windowSensor;
   protected String baseTopic;
@@ -49,8 +47,6 @@ public class ShellyDoorWindow implements MqttSubscriber {
   public ShellyDoorWindow(String id, String displayName, EventPublisher eventPublisher, EventFactory eventFactory) {
     this.id = id;
     this.displayName = displayName;
-    this.eventPublisher = eventPublisher;
-    this.eventFactory = eventFactory;
     baseTopic = MQTT_TOPIC + id + "/sensor/";
     batteryStateSensor = new ShellyBatteryStateSensor(0, this, eventPublisher, eventFactory);
     windowSensor = new ShellyWindowSensor(1, this, eventPublisher, eventFactory);
