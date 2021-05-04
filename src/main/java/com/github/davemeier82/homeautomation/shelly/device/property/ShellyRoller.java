@@ -54,17 +54,17 @@ public class ShellyRoller implements Roller {
   }
 
   public void setRelayStateTo(RollerState rollerState) {
-    if (state.get() == null || state.get().getValue() != rollerState) {
-      DataWithTimestamp<RollerState> newValue = new DataWithTimestamp<>(rollerState);
-      state.set(newValue);
+    DataWithTimestamp<RollerState> newValue = new DataWithTimestamp<>(rollerState);
+    DataWithTimestamp<RollerState> previousValue = state.getAndSet(newValue);
+    if (previousValue == null || !previousValue.getValue().equals(rollerState)) {
       eventPublisher.publishEvent(eventFactory.createRollerStateChangedEvent(this, newValue));
     }
   }
 
   public void setPositionInPercent(int positionInPercent) {
-    if (position.get() == null || position.get().getValue() != positionInPercent) {
-      DataWithTimestamp<Integer> newValue = new DataWithTimestamp<>(positionInPercent);
-      position.set(newValue);
+    DataWithTimestamp<Integer> newValue = new DataWithTimestamp<>(positionInPercent);
+    DataWithTimestamp<Integer> previousValue = position.getAndSet(newValue);
+    if (previousValue == null || !previousValue.getValue().equals(positionInPercent)) {
       eventPublisher.publishEvent(eventFactory.createRollerPositionChangedEvent(this, newValue));
     }
   }

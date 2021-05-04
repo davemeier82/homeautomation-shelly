@@ -57,8 +57,9 @@ public class ShellyWindowSensor implements WindowSensor {
   }
 
   public void setIsOpen(boolean open) {
-    if (isOpen.get() == null || !isOpen.get().getValue().equals(open)) {
-      isOpen.set(new DataWithTimestamp<>(open));
+    DataWithTimestamp<Boolean> newValue = new DataWithTimestamp<>(open);
+    DataWithTimestamp<Boolean> previousValue = isOpen.getAndSet(newValue);
+    if (previousValue == null || !previousValue.getValue().equals(open)) {
       if (open) {
         eventPublisher.publishEvent(eventFactory.createWindowOpenedEvent(this, ZonedDateTime.now()));
       } else {

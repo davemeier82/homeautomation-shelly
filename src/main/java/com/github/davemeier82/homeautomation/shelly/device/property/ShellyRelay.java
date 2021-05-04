@@ -50,9 +50,9 @@ public class ShellyRelay implements Relay {
   }
 
   public void setRelayStateTo(boolean on) {
-    if (isOn.get() == null || isOn.get().getValue() != on) {
-      DataWithTimestamp<Boolean> newValue = new DataWithTimestamp<>(on);
-      isOn.set(newValue);
+    DataWithTimestamp<Boolean> newValue = new DataWithTimestamp<>(on);
+    DataWithTimestamp<Boolean> previousValue = isOn.getAndSet(newValue);
+    if (previousValue == null || !previousValue.getValue().equals(on)) {
       eventPublisher.publishEvent(eventFactory.createRelayStateChangedEvent(this, newValue));
     }
   }

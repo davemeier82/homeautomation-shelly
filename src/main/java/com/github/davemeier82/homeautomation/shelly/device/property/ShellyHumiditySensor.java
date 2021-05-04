@@ -45,8 +45,10 @@ public class ShellyHumiditySensor implements HumiditySensor {
 
   public void setRelativeHumidityInPercent(float humidity) {
     DataWithTimestamp<Float> newValue = new DataWithTimestamp<>(humidity);
-    this.humidity.set(newValue);
-    eventPublisher.publishEvent(eventFactory.createHumidityChangedEvent(this, newValue));
+    DataWithTimestamp<Float> previousValue = this.humidity.getAndSet(newValue);
+    if (previousValue == null || !previousValue.getValue().equals(humidity)) {
+      eventPublisher.publishEvent(eventFactory.createHumidityChangedEvent(this, newValue));
+    }
   }
 
   @Override

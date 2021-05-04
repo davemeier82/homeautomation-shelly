@@ -45,8 +45,10 @@ public class ShellyBatteryStateSensor implements BatteryStateSensor {
 
   public void setBatteryLevel(int batteryLevel) {
     DataWithTimestamp<Integer> newValue = new DataWithTimestamp<>(batteryLevel);
-    this.batteryLevel.set(newValue);
-    eventPublisher.publishEvent(eventFactory.createBatteryLevelChangedEvent(this, newValue));
+    DataWithTimestamp<Integer> previousValue = this.batteryLevel.getAndSet(newValue);
+    if (previousValue == null || !previousValue.getValue().equals(batteryLevel)) {
+      eventPublisher.publishEvent(eventFactory.createBatteryLevelChangedEvent(this, newValue));
+    }
   }
 
   @Override

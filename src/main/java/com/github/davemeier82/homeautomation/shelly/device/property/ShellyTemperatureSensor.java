@@ -43,10 +43,12 @@ public class ShellyTemperatureSensor implements TemperatureSensor {
     this.eventFactory = eventFactory;
   }
 
-  public void setTemperatureInDegree(float humidity) {
-    DataWithTimestamp<Float> newValue = new DataWithTimestamp<>(humidity);
-    temperature.set(newValue);
-    eventPublisher.publishEvent(eventFactory.createTemperatureChangedEvent(this, newValue));
+  public void setTemperatureInDegree(float temperature) {
+    DataWithTimestamp<Float> newValue = new DataWithTimestamp<>(temperature);
+    DataWithTimestamp<Float> previousValue = this.temperature.getAndSet(newValue);
+    if (previousValue == null || !previousValue.getValue().equals(temperature)) {
+      eventPublisher.publishEvent(eventFactory.createTemperatureChangedEvent(this, newValue));
+    }
   }
 
   @Override
@@ -56,7 +58,7 @@ public class ShellyTemperatureSensor implements TemperatureSensor {
 
   @Override
   public long getId() {
-    return 0;
+    return id;
   }
 
   @Override

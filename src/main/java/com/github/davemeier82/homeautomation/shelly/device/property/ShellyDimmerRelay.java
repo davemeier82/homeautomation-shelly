@@ -64,9 +64,9 @@ public class ShellyDimmerRelay implements Dimmer {
   }
 
   public void setDimmingLevelInPercent(int levelInPercent) {
-    if (brightness.get() == null || brightness.get().getValue() != levelInPercent) {
-      DataWithTimestamp<Integer> newValue = new DataWithTimestamp<>(levelInPercent);
-      brightness.set(newValue);
+    DataWithTimestamp<Integer> newValue = new DataWithTimestamp<>(levelInPercent);
+    DataWithTimestamp<Integer> previousValue = brightness.getAndSet(newValue);
+    if (previousValue == null || !previousValue.getValue().equals(levelInPercent)) {
       relay.getEventPublisher().publishEvent(relay.getEventFactory().createDimmingLevelChangedEvent(this, newValue));
     }
   }
