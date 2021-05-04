@@ -17,11 +17,11 @@
 package com.github.davemeier82.homeautomation.shelly.device;
 
 import com.github.davemeier82.homeautomation.core.device.mqtt.MqttSubscriber;
+import com.github.davemeier82.homeautomation.core.device.property.DefaultBatteryStateSensor;
+import com.github.davemeier82.homeautomation.core.device.property.DefaultWindowSensor;
 import com.github.davemeier82.homeautomation.core.device.property.DeviceProperty;
 import com.github.davemeier82.homeautomation.core.event.EventFactory;
 import com.github.davemeier82.homeautomation.core.event.EventPublisher;
-import com.github.davemeier82.homeautomation.shelly.device.property.ShellyBatteryStateSensor;
-import com.github.davemeier82.homeautomation.shelly.device.property.ShellyWindowSensor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,8 +39,8 @@ public class ShellyDoorWindow implements MqttSubscriber {
   public static final String TYPE = "shelly-door-window";
 
   private final String id;
-  private final ShellyBatteryStateSensor batteryStateSensor;
-  private final ShellyWindowSensor windowSensor;
+  private final DefaultBatteryStateSensor batteryStateSensor;
+  private final DefaultWindowSensor windowSensor;
   protected String baseTopic;
   private String displayName;
 
@@ -48,8 +48,8 @@ public class ShellyDoorWindow implements MqttSubscriber {
     this.id = id;
     this.displayName = displayName;
     baseTopic = MQTT_TOPIC + id + "/sensor/";
-    batteryStateSensor = new ShellyBatteryStateSensor(0, this, eventPublisher, eventFactory);
-    windowSensor = new ShellyWindowSensor(1, this, eventPublisher, eventFactory);
+    batteryStateSensor = new DefaultBatteryStateSensor(0, this, eventPublisher, eventFactory);
+    windowSensor = new DefaultWindowSensor(1, this, eventPublisher, eventFactory);
   }
 
   @Override

@@ -17,44 +17,25 @@
 package com.github.davemeier82.homeautomation.shelly.device.property;
 
 import com.github.davemeier82.homeautomation.core.device.Device;
-import com.github.davemeier82.homeautomation.core.device.property.Relay;
-import com.github.davemeier82.homeautomation.core.event.DataWithTimestamp;
+import com.github.davemeier82.homeautomation.core.device.property.AbstractRelay;
 import com.github.davemeier82.homeautomation.core.event.EventFactory;
 import com.github.davemeier82.homeautomation.core.event.EventPublisher;
 import com.github.davemeier82.homeautomation.core.mqtt.MqttClient;
 
-import java.util.Optional;
-import java.util.concurrent.atomic.AtomicReference;
-
-public class ShellyRelay implements Relay {
-  private final long id;
-  private final Device device;
+public class ShellyRelay extends AbstractRelay {
   private final String topic;
-  private final EventPublisher eventPublisher;
-  private final EventFactory eventFactory;
   private final MqttClient mqttClient;
-  private final AtomicReference<DataWithTimestamp<Boolean>> isOn = new AtomicReference<>();
 
   public ShellyRelay(long id,
                      Device device,
-                     String topic, EventPublisher eventPublisher,
+                     String topic,
+                     EventPublisher eventPublisher,
                      EventFactory eventFactory,
                      MqttClient mqttClient
   ) {
-    this.id = id;
-    this.device = device;
+    super(id, device, eventPublisher, eventFactory);
     this.topic = topic;
-    this.eventPublisher = eventPublisher;
-    this.eventFactory = eventFactory;
     this.mqttClient = mqttClient;
-  }
-
-  public void setRelayStateTo(boolean on) {
-    DataWithTimestamp<Boolean> newValue = new DataWithTimestamp<>(on);
-    DataWithTimestamp<Boolean> previousValue = isOn.getAndSet(newValue);
-    if (previousValue == null || !previousValue.getValue().equals(on)) {
-      eventPublisher.publishEvent(eventFactory.createRelayStateChangedEvent(this, newValue));
-    }
   }
 
   @Override
@@ -65,33 +46,6 @@ public class ShellyRelay implements Relay {
   @Override
   public void turnOff() {
     mqttClient.publish(topic, "off");
-  }
-
-  @Override
-  public Optional<DataWithTimestamp<Boolean>> isOn() {
-    return Optional.ofNullable(isOn.get());
-  }
-
-  @Override
-  public long getId() {
-    return id;
-  }
-
-  @Override
-  public Device getDevice() {
-    return device;
-  }
-
-  EventPublisher getEventPublisher() {
-    return eventPublisher;
-  }
-
-  EventFactory getEventFactory() {
-    return eventFactory;
-  }
-
-  MqttClient getMqttClient() {
-    return mqttClient;
   }
 
 }

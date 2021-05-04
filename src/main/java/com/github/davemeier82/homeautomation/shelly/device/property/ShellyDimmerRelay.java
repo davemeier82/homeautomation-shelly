@@ -17,77 +17,33 @@
 package com.github.davemeier82.homeautomation.shelly.device.property;
 
 import com.github.davemeier82.homeautomation.core.device.Device;
-import com.github.davemeier82.homeautomation.core.device.property.Dimmer;
-import com.github.davemeier82.homeautomation.core.event.DataWithTimestamp;
+import com.github.davemeier82.homeautomation.core.device.property.AbstractDimmerRelay;
 import com.github.davemeier82.homeautomation.core.event.EventFactory;
 import com.github.davemeier82.homeautomation.core.event.EventPublisher;
 import com.github.davemeier82.homeautomation.core.mqtt.MqttClient;
 
-import java.util.Optional;
-import java.util.concurrent.atomic.AtomicReference;
+public class ShellyDimmerRelay extends AbstractDimmerRelay {
 
-public class ShellyDimmerRelay implements Dimmer {
-
-  private final ShellyRelay relay;
   private final String dimmerTopic;
-  private final AtomicReference<DataWithTimestamp<Integer>> brightness = new AtomicReference<>();
+  private final MqttClient mqttClient;
 
   public ShellyDimmerRelay(long id,
                            Device device,
                            String relayTopic,
-                           String dimmerTopic, EventPublisher eventPublisher,
+                           String dimmerTopic,
+                           EventPublisher eventPublisher,
                            EventFactory eventFactory,
                            MqttClient mqttClient
   ) {
+    super(new ShellyRelay(id, device, relayTopic, eventPublisher, eventFactory, mqttClient));
     this.dimmerTopic = dimmerTopic;
-    relay = new ShellyRelay(id, device, relayTopic, eventPublisher, eventFactory, mqttClient);
-  }
-
-  @Override
-  public long getId() {
-    return relay.getId();
-  }
-
-  @Override
-  public Device getDevice() {
-    return relay.getDevice();
+    this.mqttClient = mqttClient;
   }
 
   @Override
   public void setDimmingLevel(int percent) {
     boolean on = percent > 0;
-    relay.getMqttClient().publish(dimmerTopic, "{\"brightness\": " + percent + ", \"turn\": \"" + on + "\"}");
+    mqttClient.publish(dimmerTopic, "{\"brightness\": " + percent + ", \"turn\": \"" + on + "\"}");
   }
 
-  public void setRelayStateTo(boolean on) {
-    relay.setRelayStateTo(on);
-  }
-
-  public void setDimmingLevelInPercent(int levelInPercent) {
-    DataWithTimestamp<Integer> newValue = new DataWithTimestamp<>(levelInPercent);
-    DataWithTimestamp<Integer> previousValue = brightness.getAndSet(newValue);
-    if (previousValue == null || !previousValue.getValue().equals(levelInPercent)) {
-      relay.getEventPublisher().publishEvent(relay.getEventFactory().createDimmingLevelChangedEvent(this, newValue));
-    }
-  }
-
-  @Override
-  public Optional<DataWithTimestamp<Integer>> getDimmingLevelInPercent() {
-    return Optional.ofNullable(brightness.get());
-  }
-
-  @Override
-  public void turnOn() {
-    relay.turnOn();
-  }
-
-  @Override
-  public void turnOff() {
-    relay.turnOff();
-  }
-
-  @Override
-  public Optional<DataWithTimestamp<Boolean>> isOn() {
-    return relay.isOn();
-  }
 }

@@ -17,12 +17,12 @@
 package com.github.davemeier82.homeautomation.shelly.device;
 
 import com.github.davemeier82.homeautomation.core.device.mqtt.MqttSubscriber;
+import com.github.davemeier82.homeautomation.core.device.property.DefaultBatteryStateSensor;
+import com.github.davemeier82.homeautomation.core.device.property.DefaultHumiditySensor;
+import com.github.davemeier82.homeautomation.core.device.property.DefaultTemperatureSensor;
 import com.github.davemeier82.homeautomation.core.device.property.DeviceProperty;
 import com.github.davemeier82.homeautomation.core.event.EventFactory;
 import com.github.davemeier82.homeautomation.core.event.EventPublisher;
-import com.github.davemeier82.homeautomation.shelly.device.property.ShellyBatteryStateSensor;
-import com.github.davemeier82.homeautomation.shelly.device.property.ShellyHumiditySensor;
-import com.github.davemeier82.homeautomation.shelly.device.property.ShellyTemperatureSensor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,17 +44,17 @@ public class ShellyHT implements MqttSubscriber {
   private final String baseTopic;
   private String displayName;
 
-  private final ShellyBatteryStateSensor batteryStateSensor;
-  private final ShellyHumiditySensor humiditySensor;
-  private final ShellyTemperatureSensor temperatureSensor;
+  private final DefaultBatteryStateSensor batteryStateSensor;
+  private final DefaultHumiditySensor humiditySensor;
+  private final DefaultTemperatureSensor temperatureSensor;
 
   public ShellyHT(String id, String displayName, EventPublisher eventPublisher, EventFactory eventFactory) {
     this.id = id;
     this.displayName = displayName;
     baseTopic = MQTT_TOPIC + id + "/sensor/";
-    temperatureSensor = new ShellyTemperatureSensor(0, this, eventPublisher, eventFactory);
-    humiditySensor = new ShellyHumiditySensor(1, this, eventPublisher, eventFactory);
-    batteryStateSensor = new ShellyBatteryStateSensor(2, this, eventPublisher, eventFactory);
+    temperatureSensor = new DefaultTemperatureSensor(0, this, eventPublisher, eventFactory);
+    humiditySensor = new DefaultHumiditySensor(1, this, eventPublisher, eventFactory);
+    batteryStateSensor = new DefaultBatteryStateSensor(2, this, eventPublisher, eventFactory);
   }
 
   @Override

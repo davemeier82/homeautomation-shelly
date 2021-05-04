@@ -17,26 +17,15 @@
 package com.github.davemeier82.homeautomation.shelly.device.property;
 
 import com.github.davemeier82.homeautomation.core.device.Device;
-import com.github.davemeier82.homeautomation.core.device.property.Roller;
-import com.github.davemeier82.homeautomation.core.device.property.RollerState;
-import com.github.davemeier82.homeautomation.core.event.DataWithTimestamp;
+import com.github.davemeier82.homeautomation.core.device.property.AbstractRoller;
 import com.github.davemeier82.homeautomation.core.event.EventFactory;
 import com.github.davemeier82.homeautomation.core.event.EventPublisher;
 import com.github.davemeier82.homeautomation.core.mqtt.MqttClient;
 
-import java.util.Optional;
-import java.util.concurrent.atomic.AtomicReference;
+public class ShellyRoller extends AbstractRoller {
 
-public class ShellyRoller implements Roller {
-
-  private final long id;
-  private final Device device;
   private final String topic;
-  private final EventPublisher eventPublisher;
-  private final EventFactory eventFactory;
   private final MqttClient mqttClient;
-  private final AtomicReference<DataWithTimestamp<RollerState>> state = new AtomicReference<>();
-  private final AtomicReference<DataWithTimestamp<Integer>> position = new AtomicReference<>();
 
   public ShellyRoller(long id,
                       Device device,
@@ -45,28 +34,9 @@ public class ShellyRoller implements Roller {
                       EventFactory eventFactory,
                       MqttClient mqttClient
   ) {
-    this.id = id;
-    this.device = device;
+    super(id, device, eventPublisher, eventFactory);
     this.topic = topic;
-    this.eventPublisher = eventPublisher;
-    this.eventFactory = eventFactory;
     this.mqttClient = mqttClient;
-  }
-
-  public void setRelayStateTo(RollerState rollerState) {
-    DataWithTimestamp<RollerState> newValue = new DataWithTimestamp<>(rollerState);
-    DataWithTimestamp<RollerState> previousValue = state.getAndSet(newValue);
-    if (previousValue == null || !previousValue.getValue().equals(rollerState)) {
-      eventPublisher.publishEvent(eventFactory.createRollerStateChangedEvent(this, newValue));
-    }
-  }
-
-  public void setPositionInPercent(int positionInPercent) {
-    DataWithTimestamp<Integer> newValue = new DataWithTimestamp<>(positionInPercent);
-    DataWithTimestamp<Integer> previousValue = position.getAndSet(newValue);
-    if (previousValue == null || !previousValue.getValue().equals(positionInPercent)) {
-      eventPublisher.publishEvent(eventFactory.createRollerPositionChangedEvent(this, newValue));
-    }
   }
 
   @Override
@@ -89,23 +59,4 @@ public class ShellyRoller implements Roller {
     mqttClient.publish(topic + "/pos", String.valueOf(percent));
   }
 
-  @Override
-  public Optional<DataWithTimestamp<Integer>> getPositionInPercent() {
-    return Optional.ofNullable(position.get());
-  }
-
-  @Override
-  public Optional<DataWithTimestamp<RollerState>> getState() {
-    return Optional.ofNullable(state.get());
-  }
-
-  @Override
-  public long getId() {
-    return id;
-  }
-
-  @Override
-  public Device getDevice() {
-    return device;
-  }
 }
