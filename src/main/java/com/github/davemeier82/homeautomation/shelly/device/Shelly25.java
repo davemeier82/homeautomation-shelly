@@ -17,6 +17,7 @@
 package com.github.davemeier82.homeautomation.shelly.device;
 
 import com.github.davemeier82.homeautomation.core.device.mqtt.MqttSubscriber;
+import com.github.davemeier82.homeautomation.core.device.property.DefaultPowerSensor;
 import com.github.davemeier82.homeautomation.core.device.property.DeviceProperty;
 import com.github.davemeier82.homeautomation.core.event.EventFactory;
 import com.github.davemeier82.homeautomation.core.event.EventPublisher;
@@ -31,6 +32,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static com.github.davemeier82.homeautomation.shelly.mapper.RollerStateMapper.rollerStateFrom;
+import static java.lang.Double.parseDouble;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 public class Shelly25 implements MqttSubscriber {
@@ -44,6 +46,7 @@ public class Shelly25 implements MqttSubscriber {
   private final String baseTopic;
   private final List<ShellyRelay> relays;
   private final ShellyRoller roller;
+  private final List<DefaultPowerSensor> powerSensors;
   private String displayName;
 
   public Shelly25(String id, String displayName, MqttClient mqttClient, EventPublisher eventPublisher, EventFactory eventFactory) {
@@ -55,6 +58,10 @@ public class Shelly25 implements MqttSubscriber {
         new ShellyRelay(1, this, getRelayCommandTopic(1), eventPublisher, eventFactory, mqttClient)
     );
     roller = new ShellyRoller(2, this, getRollerCommandTopic(), eventPublisher, eventFactory, mqttClient);
+    powerSensors = List.of(
+        new DefaultPowerSensor(3, this, eventPublisher, eventFactory),
+        new DefaultPowerSensor(4, this, eventPublisher, eventFactory)
+    );
   }
 
   @Override
@@ -73,6 +80,10 @@ public class Shelly25 implements MqttSubscriber {
         changeStateOfRelay(1, message);
       } else if (topic.startsWith(getRollerTopic())) {
         processRollerMessage(topic, message);
+      } else if (topic.equals(getRelayPowerTopic(0))) {
+        processRelayPowerMessage(0, message);
+      } else if (topic.equals(getRelayPowerTopic(1))) {
+        processRelayPowerMessage(1, message);
       }
     });
   }
@@ -83,6 +94,10 @@ public class Shelly25 implements MqttSubscriber {
     } else if (topic.endsWith("/pos")) {
       roller.setPositionInPercent(Integer.parseInt(message));
     }
+  }
+
+  private void processRelayPowerMessage(int relayIndex, String message) {
+    powerSensors.get(relayIndex).setWatt(parseDouble(message));
   }
 
   private void changeStateOfRelay(int relayIndex, String message) {
@@ -115,6 +130,10 @@ public class Shelly25 implements MqttSubscriber {
     return baseTopic + "relay/" + relayIndex;
   }
 
+  private String getRelayPowerTopic(int relayIndex) {
+    return getRelayTopic(relayIndex) + "/power";
+  }
+
   private String getRollerTopic() {
     return baseTopic + "roller/0";
   }
@@ -131,6 +150,6 @@ public class Shelly25 implements MqttSubscriber {
 
   @Override
   public List<? extends DeviceProperty> getDeviceProperties() {
-    return List.of(relays.get(0), relays.get(1), roller);
+    return List.of(relays.get(0), relays.get(1), roller, powerSensors.get(0), powerSensors.get(1));
   }
 }
