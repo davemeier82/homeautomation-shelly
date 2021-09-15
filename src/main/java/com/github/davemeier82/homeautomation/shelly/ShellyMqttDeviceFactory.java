@@ -27,6 +27,7 @@ import com.github.davemeier82.homeautomation.shelly.device.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -72,7 +73,7 @@ public class ShellyMqttDeviceFactory implements MqttDeviceFactory {
   @Override
   public Optional<MqttSubscriber> createMqttSubscriber(DeviceId deviceId) {
     try {
-      return Optional.of(createDevice(deviceId.getType(), deviceId.getId(), deviceId.toString()));
+      return Optional.of(createDevice(deviceId.getType(), deviceId.getId(), deviceId.toString(), Map.of()));
     } catch (IllegalArgumentException e) {
       log.debug("unknown device with id: {}", deviceId);
       return Optional.empty();
@@ -90,7 +91,7 @@ public class ShellyMqttDeviceFactory implements MqttDeviceFactory {
   }
 
   @Override
-  public MqttSubscriber createDevice(String type, String id, String displayName) {
+  public MqttSubscriber createDevice(String type, String id, String displayName, Map<String, String> parameters) {
     MqttSubscriber device;
     if (Shelly1.TYPE.equalsIgnoreCase(type)) {
       device = createShelly1(id, displayName);
