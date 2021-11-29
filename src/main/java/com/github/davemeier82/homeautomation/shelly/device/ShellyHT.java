@@ -17,11 +17,11 @@
 package com.github.davemeier82.homeautomation.shelly.device;
 
 import com.github.davemeier82.homeautomation.core.device.mqtt.MqttSubscriber;
-import com.github.davemeier82.homeautomation.core.device.property.DefaultBatteryStateSensor;
-import com.github.davemeier82.homeautomation.core.device.property.DefaultHumiditySensor;
-import com.github.davemeier82.homeautomation.core.device.property.DefaultTemperatureSensor;
+import com.github.davemeier82.homeautomation.core.device.property.defaults.DefaultBatteryStateSensor;
+import com.github.davemeier82.homeautomation.core.device.property.defaults.DefaultHumiditySensor;
+import com.github.davemeier82.homeautomation.core.device.property.defaults.DefaultTemperatureSensor;
 import com.github.davemeier82.homeautomation.core.device.property.DeviceProperty;
-import com.github.davemeier82.homeautomation.core.event.EventFactory;
+import com.github.davemeier82.homeautomation.core.event.factory.EventFactory;
 import com.github.davemeier82.homeautomation.core.event.EventPublisher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
