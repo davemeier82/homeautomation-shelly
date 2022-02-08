@@ -18,10 +18,10 @@ package com.github.davemeier82.homeautomation.shelly.device;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.davemeier82.homeautomation.core.device.mqtt.MqttSubscriber;
+import com.github.davemeier82.homeautomation.core.device.mqtt.DefaultMqttSubscriber;
 import com.github.davemeier82.homeautomation.core.device.property.DeviceProperty;
-import com.github.davemeier82.homeautomation.core.event.factory.EventFactory;
 import com.github.davemeier82.homeautomation.core.event.EventPublisher;
+import com.github.davemeier82.homeautomation.core.event.factory.EventFactory;
 import com.github.davemeier82.homeautomation.core.mqtt.MqttClient;
 import com.github.davemeier82.homeautomation.shelly.device.property.ShellyDimmerRelay;
 import org.slf4j.Logger;
@@ -29,11 +29,12 @@ import org.slf4j.LoggerFactory;
 
 import java.nio.ByteBuffer;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
-public class ShellyDimmer implements MqttSubscriber {
+public class ShellyDimmer extends DefaultMqttSubscriber {
   private static final Logger log = LoggerFactory.getLogger(ShellyDimmer.class);
   public static final String PREFIX = "shellydimmer-";
   private static final String MQTT_TOPIC = "shellies/" + PREFIX;
@@ -44,17 +45,16 @@ public class ShellyDimmer implements MqttSubscriber {
   private final ObjectMapper objectMapper;
   private final ShellyDimmerRelay dimmer;
 
-  private String displayName;
-
   public ShellyDimmer(String id,
                       String displayName,
                       MqttClient mqttClient,
                       EventPublisher eventPublisher,
                       EventFactory eventFactory,
-                      ObjectMapper objectMapper
+                      ObjectMapper objectMapper,
+                      Map<String, String> customIdentifiers
   ) {
+    super(displayName, customIdentifiers);
     this.id = id;
-    this.displayName = displayName;
     baseTopic = MQTT_TOPIC + id + "/";
     this.objectMapper = objectMapper;
     dimmer = new ShellyDimmerRelay(0, this, getCommandTopic(), getSetTopic(), eventPublisher, eventFactory, mqttClient);
@@ -117,16 +117,6 @@ public class ShellyDimmer implements MqttSubscriber {
     } else if ("on".equalsIgnoreCase(message)) {
       dimmer.setRelayStateTo(true);
     }
-  }
-
-  @Override
-  public String getDisplayName() {
-    return displayName;
-  }
-
-  @Override
-  public void setDisplayName(String displayName) {
-    this.displayName = displayName;
   }
 
   @Override

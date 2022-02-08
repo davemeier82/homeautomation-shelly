@@ -16,16 +16,23 @@
 
 package com.github.davemeier82.homeautomation.shelly.device;
 
-import com.github.davemeier82.homeautomation.core.event.factory.EventFactory;
 import com.github.davemeier82.homeautomation.core.event.EventPublisher;
+import com.github.davemeier82.homeautomation.core.event.factory.EventFactory;
+
+import java.util.Map;
 
 public class ShellyDoorWindow2 extends ShellyDoorWindow {
   public static final String PREFIX = "shellydw2-";
   private static final String MQTT_TOPIC = "shellies/" + PREFIX;
   public static final String TYPE = "shelly-door-window-2";
 
-  public ShellyDoorWindow2(String id, String displayName, EventPublisher eventPublisher, EventFactory eventFactory) {
-    super(id, displayName, eventPublisher, eventFactory);
+  public ShellyDoorWindow2(String id,
+                           String displayName,
+                           EventPublisher eventPublisher,
+                           EventFactory eventFactory,
+                           Map<String, String> customIdentifiers
+  ) {
+    super(id, displayName, eventPublisher, eventFactory, customIdentifiers);
     baseTopic = MQTT_TOPIC + id + "/sensor/";
   }
 

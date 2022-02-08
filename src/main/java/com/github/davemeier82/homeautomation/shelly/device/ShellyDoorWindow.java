@@ -16,23 +16,24 @@
 
 package com.github.davemeier82.homeautomation.shelly.device;
 
-import com.github.davemeier82.homeautomation.core.device.mqtt.MqttSubscriber;
+import com.github.davemeier82.homeautomation.core.device.mqtt.DefaultMqttSubscriber;
+import com.github.davemeier82.homeautomation.core.device.property.DeviceProperty;
 import com.github.davemeier82.homeautomation.core.device.property.defaults.DefaultBatteryStateSensor;
 import com.github.davemeier82.homeautomation.core.device.property.defaults.DefaultWindowSensor;
-import com.github.davemeier82.homeautomation.core.device.property.DeviceProperty;
-import com.github.davemeier82.homeautomation.core.event.factory.EventFactory;
 import com.github.davemeier82.homeautomation.core.event.EventPublisher;
+import com.github.davemeier82.homeautomation.core.event.factory.EventFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.nio.ByteBuffer;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import static java.lang.Integer.parseInt;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
-public class ShellyDoorWindow implements MqttSubscriber {
+public class ShellyDoorWindow extends DefaultMqttSubscriber {
   private static final Logger log = LoggerFactory.getLogger(ShellyDoorWindow.class);
   public static final String PREFIX = "shellydw-";
   private static final String MQTT_TOPIC = "shellies/" + PREFIX;
@@ -42,11 +43,15 @@ public class ShellyDoorWindow implements MqttSubscriber {
   private final DefaultBatteryStateSensor batteryStateSensor;
   private final DefaultWindowSensor windowSensor;
   protected String baseTopic;
-  private String displayName;
 
-  public ShellyDoorWindow(String id, String displayName, EventPublisher eventPublisher, EventFactory eventFactory) {
+  public ShellyDoorWindow(String id,
+                          String displayName,
+                          EventPublisher eventPublisher,
+                          EventFactory eventFactory,
+                          Map<String, String> customIdentifiers
+  ) {
+    super(displayName, customIdentifiers);
     this.id = id;
-    this.displayName = displayName;
     baseTopic = MQTT_TOPIC + id + "/sensor/";
     batteryStateSensor = new DefaultBatteryStateSensor(0, this, eventPublisher, eventFactory);
     windowSensor = new DefaultWindowSensor(1, this, eventPublisher, eventFactory);
@@ -85,16 +90,6 @@ public class ShellyDoorWindow implements MqttSubscriber {
         windowSensor.setTiltAngleInDegree(parseInt(message));
       }
     });
-  }
-
-  @Override
-  public String getDisplayName() {
-    return displayName;
-  }
-
-  @Override
-  public void setDisplayName(String displayName) {
-    this.displayName = displayName;
   }
 
   @Override

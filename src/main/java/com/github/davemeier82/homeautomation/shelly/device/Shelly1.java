@@ -16,10 +16,10 @@
 
 package com.github.davemeier82.homeautomation.shelly.device;
 
-import com.github.davemeier82.homeautomation.core.device.mqtt.MqttSubscriber;
+import com.github.davemeier82.homeautomation.core.device.mqtt.DefaultMqttSubscriber;
 import com.github.davemeier82.homeautomation.core.device.property.DeviceProperty;
-import com.github.davemeier82.homeautomation.core.event.factory.EventFactory;
 import com.github.davemeier82.homeautomation.core.event.EventPublisher;
+import com.github.davemeier82.homeautomation.core.event.factory.EventFactory;
 import com.github.davemeier82.homeautomation.core.mqtt.MqttClient;
 import com.github.davemeier82.homeautomation.shelly.device.property.ShellyRelay;
 import org.slf4j.Logger;
@@ -27,11 +27,12 @@ import org.slf4j.LoggerFactory;
 
 import java.nio.ByteBuffer;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
-public class Shelly1 implements MqttSubscriber {
+public class Shelly1 extends DefaultMqttSubscriber {
   private static final Logger log = LoggerFactory.getLogger(Shelly1.class);
   public static final String PREFIX = "shelly1-";
   private static final String MQTT_TOPIC = "shellies/" + PREFIX;
@@ -40,11 +41,16 @@ public class Shelly1 implements MqttSubscriber {
   private final String id;
   private final String baseTopic;
   private final ShellyRelay relay;
-  private String displayName;
 
-  public Shelly1(String id, String displayName, MqttClient mqttClient, EventPublisher eventPublisher, EventFactory eventFactory) {
+  public Shelly1(String id,
+                 String displayName,
+                 MqttClient mqttClient,
+                 EventPublisher eventPublisher,
+                 EventFactory eventFactory,
+                 Map<String, String> customIdentifiers
+  ) {
+    super(displayName, customIdentifiers);
     this.id = id;
-    this.displayName = displayName;
     baseTopic = MQTT_TOPIC + id + "/";
     relay = new ShellyRelay(0, this, getCommandTopic(), eventPublisher, eventFactory, mqttClient);
   }
@@ -85,16 +91,6 @@ public class Shelly1 implements MqttSubscriber {
         }
       }
     });
-  }
-
-  @Override
-  public String getDisplayName() {
-    return displayName;
-  }
-
-  @Override
-  public void setDisplayName(String displayName) {
-    this.displayName = displayName;
   }
 
   @Override

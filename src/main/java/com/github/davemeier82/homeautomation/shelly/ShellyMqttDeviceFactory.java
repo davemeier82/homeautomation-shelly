@@ -20,8 +20,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.davemeier82.homeautomation.core.device.DeviceId;
 import com.github.davemeier82.homeautomation.core.device.mqtt.MqttDeviceFactory;
 import com.github.davemeier82.homeautomation.core.device.mqtt.MqttSubscriber;
-import com.github.davemeier82.homeautomation.core.event.factory.EventFactory;
 import com.github.davemeier82.homeautomation.core.event.EventPublisher;
+import com.github.davemeier82.homeautomation.core.event.factory.EventFactory;
 import com.github.davemeier82.homeautomation.core.mqtt.MqttClient;
 import com.github.davemeier82.homeautomation.shelly.device.*;
 import org.slf4j.Logger;
@@ -73,7 +73,7 @@ public class ShellyMqttDeviceFactory implements MqttDeviceFactory {
   @Override
   public Optional<MqttSubscriber> createMqttSubscriber(DeviceId deviceId) {
     try {
-      return Optional.of(createDevice(deviceId.type(), deviceId.id(), deviceId.toString(), Map.of()));
+      return Optional.of(createDevice(deviceId.type(), deviceId.id(), deviceId.toString(), Map.of(), Map.of()));
     } catch (IllegalArgumentException e) {
       log.debug("unknown device with id: {}", deviceId);
       return Optional.empty();
@@ -91,22 +91,27 @@ public class ShellyMqttDeviceFactory implements MqttDeviceFactory {
   }
 
   @Override
-  public MqttSubscriber createDevice(String type, String id, String displayName, Map<String, String> parameters) {
+  public MqttSubscriber createDevice(String type,
+                                     String id,
+                                     String displayName,
+                                     Map<String, String> parameters,
+                                     Map<String, String> customIdentifiers
+  ) {
     MqttSubscriber device;
     if (Shelly1.TYPE.equalsIgnoreCase(type)) {
-      device = createShelly1(id, displayName);
+      device = createShelly1(id, displayName, customIdentifiers);
     } else if (Shelly2.TYPE.equalsIgnoreCase(type)) {
-      device = createShelly2(id, displayName);
+      device = createShelly2(id, displayName, customIdentifiers);
     } else if (Shelly25.TYPE.equalsIgnoreCase(type)) {
-      device = createShelly25(id, displayName);
+      device = createShelly25(id, displayName, customIdentifiers);
     } else if (ShellyHT.TYPE.equalsIgnoreCase(type)) {
-      device = createShellyHT(id, displayName);
+      device = createShellyHT(id, displayName, customIdentifiers);
     } else if (ShellyDoorWindow.TYPE.equalsIgnoreCase(type)) {
-      device = createShellyDoorWindow(id, displayName);
+      device = createShellyDoorWindow(id, displayName, customIdentifiers);
     } else if (ShellyDoorWindow2.TYPE.equalsIgnoreCase(type)) {
-      device = createShellyDoorWindow2(id, displayName);
+      device = createShellyDoorWindow2(id, displayName, customIdentifiers);
     } else if (ShellyDimmer.TYPE.equalsIgnoreCase(type)) {
-      device = createShellyDimmer(id, displayName);
+      device = createShellyDimmer(id, displayName, customIdentifiers);
     } else {
       throw new IllegalArgumentException("device type '" + type + "' not supported");
     }
@@ -150,38 +155,38 @@ public class ShellyMqttDeviceFactory implements MqttDeviceFactory {
     return Optional.ofNullable(type);
   }
 
-  private ShellyDoorWindow2 createShellyDoorWindow2(String id, String displayName) {
+  private ShellyDoorWindow2 createShellyDoorWindow2(String id, String displayName, Map<String, String> customIdentifiers) {
     log.debug("creating Shelly Door/Window 2 with id {} ({})", id, displayName);
-    return new ShellyDoorWindow2(id, displayName, eventPublisher, eventFactory);
+    return new ShellyDoorWindow2(id, displayName, eventPublisher, eventFactory, customIdentifiers);
   }
 
-  private ShellyDoorWindow createShellyDoorWindow(String id, String displayName) {
+  private ShellyDoorWindow createShellyDoorWindow(String id, String displayName, Map<String, String> customIdentifiers) {
     log.debug("creating Shelly Door/Window with id {} ({})", id, displayName);
-    return new ShellyDoorWindow(id, displayName, eventPublisher, eventFactory);
+    return new ShellyDoorWindow(id, displayName, eventPublisher, eventFactory, customIdentifiers);
   }
 
-  private ShellyHT createShellyHT(String id, String displayName) {
+  private ShellyHT createShellyHT(String id, String displayName, Map<String, String> customIdentifiers) {
     log.debug("creating Shelly H&T with id {} ({})", id, displayName);
-    return new ShellyHT(id, displayName, eventPublisher, eventFactory);
+    return new ShellyHT(id, displayName, eventPublisher, eventFactory, customIdentifiers);
   }
 
-  private Shelly25 createShelly25(String id, String displayName) {
+  private Shelly25 createShelly25(String id, String displayName, Map<String, String> customIdentifiers) {
     log.debug("creating Shelly 2.5 with id {} ({})", id, displayName);
-    return new Shelly25(id, displayName, mqttClient, eventPublisher, eventFactory);
+    return new Shelly25(id, displayName, mqttClient, eventPublisher, eventFactory, customIdentifiers);
   }
 
-  private Shelly2 createShelly2(String id, String displayName) {
+  private Shelly2 createShelly2(String id, String displayName, Map<String, String> customIdentifiers) {
     log.debug("creating Shelly 2 with id {} ({})", id, displayName);
-    return new Shelly2(id, displayName, mqttClient, eventPublisher, eventFactory);
+    return new Shelly2(id, displayName, mqttClient, eventPublisher, eventFactory, customIdentifiers);
   }
 
-  private Shelly1 createShelly1(String id, String displayName) {
+  private Shelly1 createShelly1(String id, String displayName, Map<String, String> customIdentifiers) {
     log.debug("creating Shelly 1 with id {} ({})", id, displayName);
-    return new Shelly1(id, displayName, mqttClient, eventPublisher, eventFactory);
+    return new Shelly1(id, displayName, mqttClient, eventPublisher, eventFactory, customIdentifiers);
   }
 
-  private ShellyDimmer createShellyDimmer(String id, String displayName) {
+  private ShellyDimmer createShellyDimmer(String id, String displayName, Map<String, String> customIdentifiers) {
     log.debug("creating Shelly Dimmer with id {} ({})", id, displayName);
-    return new ShellyDimmer(id, displayName, mqttClient, eventPublisher, eventFactory, objectMapper);
+    return new ShellyDimmer(id, displayName, mqttClient, eventPublisher, eventFactory, objectMapper, customIdentifiers);
   }
 }

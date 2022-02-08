@@ -16,25 +16,26 @@
 
 package com.github.davemeier82.homeautomation.shelly.device;
 
-import com.github.davemeier82.homeautomation.core.device.mqtt.MqttSubscriber;
+import com.github.davemeier82.homeautomation.core.device.mqtt.DefaultMqttSubscriber;
+import com.github.davemeier82.homeautomation.core.device.property.DeviceProperty;
 import com.github.davemeier82.homeautomation.core.device.property.defaults.DefaultBatteryStateSensor;
 import com.github.davemeier82.homeautomation.core.device.property.defaults.DefaultHumiditySensor;
 import com.github.davemeier82.homeautomation.core.device.property.defaults.DefaultTemperatureSensor;
-import com.github.davemeier82.homeautomation.core.device.property.DeviceProperty;
-import com.github.davemeier82.homeautomation.core.event.factory.EventFactory;
 import com.github.davemeier82.homeautomation.core.event.EventPublisher;
+import com.github.davemeier82.homeautomation.core.event.factory.EventFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.nio.ByteBuffer;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import static java.lang.Float.parseFloat;
 import static java.lang.Integer.parseInt;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
-public class ShellyHT implements MqttSubscriber {
+public class ShellyHT extends DefaultMqttSubscriber {
   private static final Logger log = LoggerFactory.getLogger(ShellyHT.class);
   public static final String PREFIX = "shellyht-";
   private static final String MQTT_TOPIC = "shellies/" + PREFIX;
@@ -42,15 +43,14 @@ public class ShellyHT implements MqttSubscriber {
 
   private final String id;
   private final String baseTopic;
-  private String displayName;
 
   private final DefaultBatteryStateSensor batteryStateSensor;
   private final DefaultHumiditySensor humiditySensor;
   private final DefaultTemperatureSensor temperatureSensor;
 
-  public ShellyHT(String id, String displayName, EventPublisher eventPublisher, EventFactory eventFactory) {
+  public ShellyHT(String id, String displayName, EventPublisher eventPublisher, EventFactory eventFactory, Map<String, String> customIdentifiers) {
+    super(displayName, customIdentifiers);
     this.id = id;
-    this.displayName = displayName;
     baseTopic = MQTT_TOPIC + id + "/sensor/";
     temperatureSensor = new DefaultTemperatureSensor(0, this, eventPublisher, eventFactory);
     humiditySensor = new DefaultHumiditySensor(1, this, eventPublisher, eventFactory);
@@ -85,16 +85,6 @@ public class ShellyHT implements MqttSubscriber {
   @Override
   public String getId() {
     return id;
-  }
-
-  @Override
-  public String getDisplayName() {
-    return displayName;
-  }
-
-  @Override
-  public void setDisplayName(String displayName) {
-    this.displayName = displayName;
   }
 
   @Override
