@@ -103,7 +103,7 @@ public class ShellyDimmer extends DefaultMqttSubscriber {
   private void processStatusMessage(String message) {
     try {
       StatusMessage statusMessage = objectMapper.readValue(message, StatusMessage.class);
-      boolean newOnState = statusMessage.isOn;
+      boolean newOnState = statusMessage.ison;
       dimmer.setRelayStateTo(newOnState);
       dimmer.setDimmingLevelInPercent(statusMessage.brightness);
     } catch (JsonProcessingException e) {
@@ -125,7 +125,7 @@ public class ShellyDimmer extends DefaultMqttSubscriber {
   }
 
   private static class StatusMessage {
-    public boolean isOn;
+    public boolean ison;
     public int brightness;
   }
 }
