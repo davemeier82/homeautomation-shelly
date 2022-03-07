@@ -18,8 +18,8 @@ package com.github.davemeier82.homeautomation.shelly.device.property;
 
 import com.github.davemeier82.homeautomation.core.device.Device;
 import com.github.davemeier82.homeautomation.core.device.property.AbstractDimmerRelay;
-import com.github.davemeier82.homeautomation.core.event.factory.EventFactory;
 import com.github.davemeier82.homeautomation.core.event.EventPublisher;
+import com.github.davemeier82.homeautomation.core.event.factory.EventFactory;
 import com.github.davemeier82.homeautomation.core.mqtt.MqttClient;
 
 public class ShellyDimmerRelay extends AbstractDimmerRelay {
@@ -43,7 +43,7 @@ public class ShellyDimmerRelay extends AbstractDimmerRelay {
   @Override
   public void setDimmingLevel(int percent) {
     boolean on = percent > 0;
-    mqttClient.publish(dimmerTopic, "{\"brightness\": " + percent + ", \"turn\": \"" + on + "\"}");
+    mqttClient.publish(dimmerTopic, "{\"brightness\": " + percent + ", \"turn\": \"" + (on ? "on" : "off") + "\"}");
   }
 
 }
