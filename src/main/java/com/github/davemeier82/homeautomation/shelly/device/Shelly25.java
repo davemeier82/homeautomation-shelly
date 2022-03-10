@@ -96,7 +96,7 @@ public class Shelly25 extends DefaultMqttSubscriber {
 
   private void processRollerMessage(String topic, String message) {
     if (topic.equals(getRollerTopic())) {
-      roller.setRelayStateTo(rollerStateFrom(message));
+      roller.setRollerState(rollerStateFrom(message));
     } else if (topic.endsWith("/pos")) {
       roller.setPositionInPercent(Integer.parseInt(message));
     }
