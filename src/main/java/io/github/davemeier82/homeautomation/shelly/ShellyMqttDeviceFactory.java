@@ -14,16 +14,16 @@
  * limitations under the License.
  */
 
-package com.github.davemeier82.homeautomation.shelly;
+package io.github.davemeier82.homeautomation.shelly;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.davemeier82.homeautomation.core.device.DeviceId;
-import com.github.davemeier82.homeautomation.core.device.mqtt.MqttDeviceFactory;
-import com.github.davemeier82.homeautomation.core.device.mqtt.MqttSubscriber;
-import com.github.davemeier82.homeautomation.core.event.EventPublisher;
-import com.github.davemeier82.homeautomation.core.event.factory.EventFactory;
-import com.github.davemeier82.homeautomation.core.mqtt.MqttClient;
-import com.github.davemeier82.homeautomation.shelly.device.*;
+import io.github.davemeier82.homeautomation.core.device.DeviceId;
+import io.github.davemeier82.homeautomation.core.device.mqtt.MqttDeviceFactory;
+import io.github.davemeier82.homeautomation.core.device.mqtt.MqttSubscriber;
+import io.github.davemeier82.homeautomation.core.event.EventPublisher;
+import io.github.davemeier82.homeautomation.core.event.factory.EventFactory;
+import io.github.davemeier82.homeautomation.core.mqtt.MqttClient;
+import io.github.davemeier82.homeautomation.shelly.device.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

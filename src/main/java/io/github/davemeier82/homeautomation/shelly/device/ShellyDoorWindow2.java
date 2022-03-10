@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package com.github.davemeier82.homeautomation.shelly.device;
+package io.github.davemeier82.homeautomation.shelly.device;
 
-import com.github.davemeier82.homeautomation.core.event.EventPublisher;
-import com.github.davemeier82.homeautomation.core.event.factory.EventFactory;
+import io.github.davemeier82.homeautomation.core.event.EventPublisher;
+import io.github.davemeier82.homeautomation.core.event.factory.EventFactory;
 
 import java.util.Map;
 

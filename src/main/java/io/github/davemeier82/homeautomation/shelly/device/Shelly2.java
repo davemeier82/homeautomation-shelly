@@ -14,16 +14,15 @@
  * limitations under the License.
  */
 
-package com.github.davemeier82.homeautomation.shelly.device;
+package io.github.davemeier82.homeautomation.shelly.device;
 
-import com.github.davemeier82.homeautomation.core.device.mqtt.DefaultMqttSubscriber;
-import com.github.davemeier82.homeautomation.core.device.property.DeviceProperty;
-import com.github.davemeier82.homeautomation.core.device.property.defaults.DefaultPowerSensor;
-import com.github.davemeier82.homeautomation.core.event.EventPublisher;
-import com.github.davemeier82.homeautomation.core.event.factory.EventFactory;
-import com.github.davemeier82.homeautomation.core.mqtt.MqttClient;
-import com.github.davemeier82.homeautomation.shelly.device.property.ShellyRelay;
-import com.github.davemeier82.homeautomation.shelly.device.property.ShellyRoller;
+import io.github.davemeier82.homeautomation.core.device.mqtt.DefaultMqttSubscriber;
+import io.github.davemeier82.homeautomation.core.device.property.DeviceProperty;
+import io.github.davemeier82.homeautomation.core.event.EventPublisher;
+import io.github.davemeier82.homeautomation.core.event.factory.EventFactory;
+import io.github.davemeier82.homeautomation.core.mqtt.MqttClient;
+import io.github.davemeier82.homeautomation.shelly.device.property.ShellyRelay;
+import io.github.davemeier82.homeautomation.shelly.device.property.ShellyRoller;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,29 +31,27 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import static com.github.davemeier82.homeautomation.shelly.mapper.RollerStateMapper.rollerStateFrom;
-import static java.lang.Double.parseDouble;
+import static io.github.davemeier82.homeautomation.shelly.mapper.RollerStateMapper.rollerStateFrom;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
-public class Shelly25 extends DefaultMqttSubscriber {
+public class Shelly2 extends DefaultMqttSubscriber {
 
-  private static final Logger log = LoggerFactory.getLogger(Shelly25.class);
-  public static final String PREFIX = "shellyswitch25-";
+  private static final Logger log = LoggerFactory.getLogger(Shelly2.class);
+  public static final String PREFIX = "shellyswitch-";
   private static final String MQTT_TOPIC = "shellies/" + PREFIX;
-  public static final String TYPE = "shelly25";
+  public static final String TYPE = "shelly2";
 
   private final String id;
   private final String baseTopic;
   private final List<ShellyRelay> relays;
   private final ShellyRoller roller;
-  private final List<DefaultPowerSensor> powerSensors;
 
-  public Shelly25(String id,
-                  String displayName,
-                  MqttClient mqttClient,
-                  EventPublisher eventPublisher,
-                  EventFactory eventFactory,
-                  Map<String, String> customIdentifiers
+  public Shelly2(String id,
+                 String displayName,
+                 MqttClient mqttClient,
+                 EventPublisher eventPublisher,
+                 EventFactory eventFactory,
+                 Map<String, String> customIdentifiers
   ) {
     super(displayName, customIdentifiers);
     this.id = id;
@@ -64,10 +61,6 @@ public class Shelly25 extends DefaultMqttSubscriber {
         new ShellyRelay(1, this, getRelayCommandTopic(1), eventPublisher, eventFactory, mqttClient)
     );
     roller = new ShellyRoller(2, this, getRollerCommandTopic(), eventPublisher, eventFactory, mqttClient);
-    powerSensors = List.of(
-        new DefaultPowerSensor(3, this, eventPublisher, eventFactory),
-        new DefaultPowerSensor(4, this, eventPublisher, eventFactory)
-    );
   }
 
   @Override
@@ -86,10 +79,6 @@ public class Shelly25 extends DefaultMqttSubscriber {
         changeStateOfRelay(1, message);
       } else if (topic.startsWith(getRollerTopic())) {
         processRollerMessage(topic, message);
-      } else if (topic.equals(getRelayPowerTopic(0))) {
-        processRelayPowerMessage(0, message);
-      } else if (topic.equals(getRelayPowerTopic(1))) {
-        processRelayPowerMessage(1, message);
       }
     });
   }
@@ -100,10 +89,6 @@ public class Shelly25 extends DefaultMqttSubscriber {
     } else if (topic.endsWith("/pos")) {
       roller.setPositionInPercent(Integer.parseInt(message));
     }
-  }
-
-  private void processRelayPowerMessage(int relayIndex, String message) {
-    powerSensors.get(relayIndex).setWatt(parseDouble(message));
   }
 
   private void changeStateOfRelay(int relayIndex, String message) {
@@ -136,16 +121,12 @@ public class Shelly25 extends DefaultMqttSubscriber {
     return baseTopic + "relay/" + relayIndex;
   }
 
-  private String getRelayPowerTopic(int relayIndex) {
-    return getRelayTopic(relayIndex) + "/power";
-  }
-
   private String getRollerTopic() {
     return baseTopic + "roller/0";
   }
 
   @Override
   public List<? extends DeviceProperty> getDeviceProperties() {
-    return List.of(relays.get(0), relays.get(1), roller, powerSensors.get(0), powerSensors.get(1));
+    return List.of(relays.get(0), relays.get(1), roller);
   }
 }
