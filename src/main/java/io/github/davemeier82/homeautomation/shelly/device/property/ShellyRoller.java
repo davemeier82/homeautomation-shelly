@@ -22,11 +22,24 @@ import io.github.davemeier82.homeautomation.core.event.EventPublisher;
 import io.github.davemeier82.homeautomation.core.event.factory.EventFactory;
 import io.github.davemeier82.homeautomation.core.mqtt.MqttClient;
 
+/**
+ * Device property of a Shelly device that supports a roller mode.
+ */
 public class ShellyRoller extends AbstractRoller {
 
   private final String topic;
   private final MqttClient mqttClient;
 
+  /**
+   * Constructor.
+   *
+   * @param id             the device property id
+   * @param device         the device
+   * @param topic          the topic to which this device property should publish messages
+   * @param eventPublisher the event publisher
+   * @param eventFactory   the event factory
+   * @param mqttClient     the MQTT client
+   */
   public ShellyRoller(long id,
                       Device device,
                       String topic,

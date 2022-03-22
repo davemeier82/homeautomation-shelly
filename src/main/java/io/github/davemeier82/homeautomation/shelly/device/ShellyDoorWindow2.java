@@ -21,11 +21,23 @@ import io.github.davemeier82.homeautomation.core.event.factory.EventFactory;
 
 import java.util.Map;
 
+/**
+ * Shelly door/window sensor (version 2).
+ */
 public class ShellyDoorWindow2 extends ShellyDoorWindow {
   public static final String PREFIX = "shellydw2-";
   private static final String MQTT_TOPIC = "shellies/" + PREFIX;
   public static final String TYPE = "shelly-door-window-2";
 
+  /**
+   * Constructor.
+   *
+   * @param id                the device id (MAC address)
+   * @param displayName       the display name
+   * @param eventPublisher    the event publisher
+   * @param eventFactory      the event factory
+   * @param customIdentifiers optional custom identifiers
+   */
   public ShellyDoorWindow2(String id,
                            String displayName,
                            EventPublisher eventPublisher,

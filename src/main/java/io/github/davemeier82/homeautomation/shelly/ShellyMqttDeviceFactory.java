@@ -31,6 +31,9 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
+/**
+ * Factory for Shelly devices (https://shelly.cloud)
+ */
 public class ShellyMqttDeviceFactory implements MqttDeviceFactory {
   private static final Logger log = LoggerFactory.getLogger(ShellyMqttDeviceFactory.class);
   private static final String ROOT_TOPIC = "shellies/";
@@ -48,6 +51,14 @@ public class ShellyMqttDeviceFactory implements MqttDeviceFactory {
       ShellyDoorWindow2.TYPE
   );
 
+  /**
+   * Constructor
+   *
+   * @param eventPublisher the event publisher
+   * @param eventFactory   the event factory
+   * @param mqttClient     the MQTT client
+   * @param objectMapper   the object mapper used to map the MQTT message payload
+   */
   public ShellyMqttDeviceFactory(EventPublisher eventPublisher, EventFactory eventFactory, MqttClient mqttClient, ObjectMapper objectMapper) {
     this.eventPublisher = eventPublisher;
     this.eventFactory = eventFactory;

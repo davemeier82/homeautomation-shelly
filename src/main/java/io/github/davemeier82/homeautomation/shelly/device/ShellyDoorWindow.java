@@ -33,6 +33,9 @@ import java.util.Optional;
 import static java.lang.Integer.parseInt;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
+/**
+ * Shelly door/window sensor (version 1).
+ */
 public class ShellyDoorWindow extends DefaultMqttSubscriber {
   private static final Logger log = LoggerFactory.getLogger(ShellyDoorWindow.class);
   public static final String PREFIX = "shellydw-";
@@ -44,6 +47,15 @@ public class ShellyDoorWindow extends DefaultMqttSubscriber {
   private final DefaultWindowSensor windowSensor;
   protected String baseTopic;
 
+  /**
+   * Constructor.
+   *
+   * @param id                the device id (MAC address)
+   * @param displayName       the display name
+   * @param eventPublisher    the event publisher
+   * @param eventFactory      the event factory
+   * @param customIdentifiers optional custom identifiers
+   */
   public ShellyDoorWindow(String id,
                           String displayName,
                           EventPublisher eventPublisher,

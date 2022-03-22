@@ -34,6 +34,9 @@ import java.util.Optional;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
+/**
+ * Shelly Dimmer
+ */
 public class ShellyDimmer extends DefaultMqttSubscriber {
   private static final Logger log = LoggerFactory.getLogger(ShellyDimmer.class);
   public static final String PREFIX = "shellydimmer-";
@@ -45,6 +48,17 @@ public class ShellyDimmer extends DefaultMqttSubscriber {
   private final ObjectMapper objectMapper;
   private final ShellyDimmerRelay dimmer;
 
+  /**
+   * Constructor.
+   *
+   * @param id                the device id (MAC address)
+   * @param displayName       the display name
+   * @param mqttClient        the MQTT client
+   * @param eventPublisher    the event publisher
+   * @param eventFactory      the event factory
+   * @param objectMapper      the object mapper used to map the MQTT payload
+   * @param customIdentifiers optional custom identifiers
+   */
   public ShellyDimmer(String id,
                       String displayName,
                       MqttClient mqttClient,

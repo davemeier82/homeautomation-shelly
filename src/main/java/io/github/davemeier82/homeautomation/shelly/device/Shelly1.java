@@ -32,6 +32,9 @@ import java.util.Optional;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
+/**
+ * Shelly 1
+ */
 public class Shelly1 extends DefaultMqttSubscriber {
   private static final Logger log = LoggerFactory.getLogger(Shelly1.class);
   public static final String PREFIX = "shelly1-";
@@ -42,6 +45,16 @@ public class Shelly1 extends DefaultMqttSubscriber {
   private final String baseTopic;
   private final ShellyRelay relay;
 
+  /**
+   * Constructor.
+   *
+   * @param id                the device id (MAC address)
+   * @param displayName       the display name
+   * @param mqttClient        the MQTT client
+   * @param eventPublisher    the event publisher
+   * @param eventFactory      the event factory
+   * @param customIdentifiers optional custom identifiers
+   */
   public Shelly1(String id,
                  String displayName,
                  MqttClient mqttClient,

@@ -35,6 +35,9 @@ import static java.lang.Float.parseFloat;
 import static java.lang.Integer.parseInt;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
+/**
+ * Shelly humidity and temperature device.
+ */
 public class ShellyHT extends DefaultMqttSubscriber {
   private static final Logger log = LoggerFactory.getLogger(ShellyHT.class);
   public static final String PREFIX = "shellyht-";
@@ -48,6 +51,15 @@ public class ShellyHT extends DefaultMqttSubscriber {
   private final DefaultHumiditySensor humiditySensor;
   private final DefaultTemperatureSensor temperatureSensor;
 
+  /**
+   * Constructor.
+   *
+   * @param id                the device id (MAC address)
+   * @param displayName       the display name
+   * @param eventPublisher    the event publisher
+   * @param eventFactory      the event factory
+   * @param customIdentifiers optional custom identifiers
+   */
   public ShellyHT(String id, String displayName, EventPublisher eventPublisher, EventFactory eventFactory, Map<String, String> customIdentifiers) {
     super(displayName, customIdentifiers);
     this.id = id;

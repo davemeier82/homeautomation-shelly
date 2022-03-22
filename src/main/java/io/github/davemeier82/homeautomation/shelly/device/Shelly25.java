@@ -36,6 +36,9 @@ import static io.github.davemeier82.homeautomation.shelly.mapper.RollerStateMapp
 import static java.lang.Double.parseDouble;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
+/**
+ * Shelly 2.5
+ */
 public class Shelly25 extends DefaultMqttSubscriber {
 
   private static final Logger log = LoggerFactory.getLogger(Shelly25.class);
@@ -49,6 +52,16 @@ public class Shelly25 extends DefaultMqttSubscriber {
   private final ShellyRoller roller;
   private final List<DefaultPowerSensor> powerSensors;
 
+  /**
+   * Constructor.
+   *
+   * @param id                the device id (MAC address)
+   * @param displayName       the display name
+   * @param mqttClient        the MQTT client
+   * @param eventPublisher    the event publisher
+   * @param eventFactory      the event factory
+   * @param customIdentifiers optional custom identifiers
+   */
   public Shelly25(String id,
                   String displayName,
                   MqttClient mqttClient,

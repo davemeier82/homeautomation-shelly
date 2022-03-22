@@ -20,10 +20,17 @@ import io.github.davemeier82.homeautomation.core.device.property.RollerState;
 
 import static io.github.davemeier82.homeautomation.core.device.property.RollerState.*;
 
+/**
+ * Maps Shelly Roller State to the {@link RollerState}
+ */
 public final class RollerStateMapper {
   private RollerStateMapper() {
   }
 
+  /**
+   * @param state the state received in the MQTT payload
+   * @return the mapped state
+   */
   public static RollerState rollerStateFrom(String state) {
     return switch (state) {
       case "open" -> OPENING;

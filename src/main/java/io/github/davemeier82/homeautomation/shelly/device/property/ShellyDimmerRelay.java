@@ -22,11 +22,25 @@ import io.github.davemeier82.homeautomation.core.event.EventPublisher;
 import io.github.davemeier82.homeautomation.core.event.factory.EventFactory;
 import io.github.davemeier82.homeautomation.core.mqtt.MqttClient;
 
+/**
+ * Device property of a Shelly dimmer.
+ */
 public class ShellyDimmerRelay extends AbstractDimmerRelay {
 
   private final String dimmerTopic;
   private final MqttClient mqttClient;
 
+  /**
+   * Constructor.
+   *
+   * @param id             the device property id
+   * @param device         the device
+   * @param relayTopic     the topic to which this device property should publish relay messages
+   * @param dimmerTopic    the topic to which this device property should publish dimmer messages
+   * @param eventPublisher the event publisher
+   * @param eventFactory   the event factory
+   * @param mqttClient     the MQTT client
+   */
   public ShellyDimmerRelay(long id,
                            Device device,
                            String relayTopic,
