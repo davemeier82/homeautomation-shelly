@@ -35,6 +35,9 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
  * Shelly door/window sensor (version 1).
+ *
+ * @author David Meier
+ * @since 0.1.0
  */
 public class ShellyDoorWindow extends DefaultMqttSubscriber {
   private static final Logger log = LoggerFactory.getLogger(ShellyDoorWindow.class);

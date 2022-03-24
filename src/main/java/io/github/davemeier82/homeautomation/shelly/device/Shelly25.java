@@ -38,6 +38,9 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
  * Shelly 2.5
+ *
+ * @author David Meier
+ * @since 0.1.0
  */
 public class Shelly25 extends DefaultMqttSubscriber {
 

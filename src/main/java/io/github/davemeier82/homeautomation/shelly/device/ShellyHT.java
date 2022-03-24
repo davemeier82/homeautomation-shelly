@@ -37,6 +37,9 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
  * Shelly humidity and temperature device.
+ *
+ * @author David Meier
+ * @since 0.1.0
  */
 public class ShellyHT extends DefaultMqttSubscriber {
   private static final Logger log = LoggerFactory.getLogger(ShellyHT.class);

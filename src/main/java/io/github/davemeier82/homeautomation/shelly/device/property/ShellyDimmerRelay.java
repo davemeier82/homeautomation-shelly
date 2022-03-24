@@ -24,6 +24,9 @@ import io.github.davemeier82.homeautomation.core.mqtt.MqttClient;
 
 /**
  * Device property of a Shelly dimmer.
+ *
+ * @author David Meier
+ * @since 0.1.0
  */
 public class ShellyDimmerRelay extends AbstractDimmerRelay {
 

@@ -23,6 +23,9 @@ import java.util.Map;
 
 /**
  * Shelly door/window sensor (version 2).
+ *
+ * @author David Meier
+ * @since 0.1.0
  */
 public class ShellyDoorWindow2 extends ShellyDoorWindow {
   public static final String PREFIX = "shellydw2-";

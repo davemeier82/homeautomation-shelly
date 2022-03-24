@@ -33,6 +33,9 @@ import java.util.Set;
 
 /**
  * Factory for Shelly devices (https://shelly.cloud)
+ *
+ * @author David Meier
+ * @since 0.1.0
  */
 public class ShellyMqttDeviceFactory implements MqttDeviceFactory {
   private static final Logger log = LoggerFactory.getLogger(ShellyMqttDeviceFactory.class);
@@ -127,7 +130,6 @@ public class ShellyMqttDeviceFactory implements MqttDeviceFactory {
       throw new IllegalArgumentException("device type '" + type + "' not supported");
     }
     mqttClient.subscribe(device.getTopic(), device::processMessage);
-    eventPublisher.publishEvent(eventFactory.createNewDeviceCreatedEvent(device));
     return device;
   }
 
