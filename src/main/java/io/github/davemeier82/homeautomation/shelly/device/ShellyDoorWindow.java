@@ -69,7 +69,7 @@ public class ShellyDoorWindow extends DefaultMqttSubscriber {
     this.id = id;
     baseTopic = MQTT_TOPIC + id + "/sensor/";
     batteryStateSensor = new DefaultBatteryStateSensor(0, this, eventPublisher, eventFactory);
-    windowSensor = new DefaultWindowSensor(1, this, eventPublisher, eventFactory);
+    windowSensor = new DefaultWindowSensor(1, this, true, eventPublisher, eventFactory);
   }
 
   @Override
