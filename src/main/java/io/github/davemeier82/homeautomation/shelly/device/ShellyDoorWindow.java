@@ -20,6 +20,7 @@ import io.github.davemeier82.homeautomation.core.device.mqtt.DefaultMqttSubscrib
 import io.github.davemeier82.homeautomation.core.device.property.DeviceProperty;
 import io.github.davemeier82.homeautomation.core.device.property.defaults.DefaultBatteryStateSensor;
 import io.github.davemeier82.homeautomation.core.device.property.defaults.DefaultWindowSensor;
+import io.github.davemeier82.homeautomation.core.event.DataWithTimestamp;
 import io.github.davemeier82.homeautomation.core.event.EventPublisher;
 import io.github.davemeier82.homeautomation.core.event.factory.EventFactory;
 import org.slf4j.Logger;
@@ -102,7 +103,7 @@ public class ShellyDoorWindow extends DefaultMqttSubscriber {
         batteryStateSensor.setBatteryLevel(Integer.parseInt(message));
       }
       if (topic.endsWith("/tilt")) {
-        windowSensor.setTiltAngleInDegree(parseInt(message));
+        windowSensor.setTiltAngleInDegree(new DataWithTimestamp<>(parseInt(message)));
       }
     });
   }
