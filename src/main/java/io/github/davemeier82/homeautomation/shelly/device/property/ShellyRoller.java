@@ -43,7 +43,7 @@ public class ShellyRoller extends AbstractRoller {
    * @param eventFactory   the event factory
    * @param mqttClient     the MQTT client
    */
-  public ShellyRoller(long id,
+  public ShellyRoller(int id,
                       Device device,
                       String topic,
                       EventPublisher eventPublisher,

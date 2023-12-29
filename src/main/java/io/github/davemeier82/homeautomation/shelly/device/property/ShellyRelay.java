@@ -42,7 +42,7 @@ public class ShellyRelay extends AbstractRelay {
    * @param eventFactory   the event factory
    * @param mqttClient     the MQTT client
    */
-  public ShellyRelay(long id,
+  public ShellyRelay(int id,
                      Device device,
                      String topic,
                      EventPublisher eventPublisher,

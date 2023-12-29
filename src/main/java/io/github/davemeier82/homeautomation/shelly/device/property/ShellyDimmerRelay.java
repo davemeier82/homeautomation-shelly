@@ -44,7 +44,7 @@ public class ShellyDimmerRelay extends AbstractDimmerRelay {
    * @param eventFactory   the event factory
    * @param mqttClient     the MQTT client
    */
-  public ShellyDimmerRelay(long id,
+  public ShellyDimmerRelay(int id,
                            Device device,
                            String relayTopic,
                            String dimmerTopic,
