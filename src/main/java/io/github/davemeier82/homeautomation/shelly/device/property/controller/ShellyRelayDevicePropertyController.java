@@ -35,7 +35,7 @@ public class ShellyRelayDevicePropertyController implements RelayDevicePropertyC
   }
 
   private static String createTopic(DevicePropertyId devicePropertyId) {
-    return createCommandTopic(devicePropertyId, "relay");
+    return createCommandTopic(devicePropertyId, devicePropertyId.deviceId().type() == SHELLY_DIMMER ? "light" : "relay");
   }
 
   @Override

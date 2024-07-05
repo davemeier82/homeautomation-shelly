@@ -36,7 +36,7 @@ public class ShellyDimmerDevicePropertyController implements DimmerDevicePropert
   }
 
   private static String createTopic(DevicePropertyId devicePropertyId) {
-    return ShellyTopicFactory.createCommandTopic(devicePropertyId, "light");
+    return ShellyTopicFactory.createSetTopic(devicePropertyId, "light");
   }
 
   @Override
@@ -47,6 +47,7 @@ public class ShellyDimmerDevicePropertyController implements DimmerDevicePropert
   @Override
   public void settDimmingLevel(DevicePropertyId devicePropertyId, Integer dimmingLevelInPercent) {
     boolean on = dimmingLevelInPercent > 0;
-    mqttClient.publish(createTopic(devicePropertyId), "{\"brightness\": " + dimmingLevelInPercent + ", \"turn\": \"" + (on ? "on" : "off") + "\"}");
+    var dimmerId = new DevicePropertyId(devicePropertyId.deviceId(), "0");
+    mqttClient.publish(createTopic(dimmerId), "{\"brightness\": " + dimmingLevelInPercent + ", \"turn\": \"" + (on ? "on" : "off") + "\"}");
   }
 }

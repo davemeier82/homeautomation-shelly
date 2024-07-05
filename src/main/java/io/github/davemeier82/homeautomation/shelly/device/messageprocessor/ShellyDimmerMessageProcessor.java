@@ -53,10 +53,10 @@ public class ShellyDimmerMessageProcessor implements ShellyDeviceMessageProcesso
     payload.ifPresent(byteBuffer -> {
       String message = UTF_8.decode(byteBuffer).toString();
       log.debug("{}: {}", subTopic, message);
-      if ("light".equals(devicePropertyType)) {
+      if ("status".equals(subTopic)) {
+        processStatusMessage(message, devicePropertyId);
+      } else if ("light".equals(devicePropertyType)) {
         changeStateOfRelay(devicePropertyId, message);
-      } else if ("status".equals(subTopic)) {
-        processRollerMessage(message, devicePropertyId);
       }
     });
   }
@@ -73,12 +73,13 @@ public class ShellyDimmerMessageProcessor implements ShellyDeviceMessageProcesso
     relayStateValueUpdateService.setValue(isOn, OffsetDateTime.now(), devicePropertyId, "Relay" + devicePropertyId.id());
   }
 
-  private void processRollerMessage(String message, DevicePropertyId devicePropertyId) {
+  private void processStatusMessage(String message, DevicePropertyId devicePropertyId) {
     try {
       StatusMessage statusMessage = objectMapper.readValue(message, StatusMessage.class);
       boolean newOnState = statusMessage.ison;
       updateRelayValue(newOnState, devicePropertyId);
-      dimmingLevelValueUpdateService.setValue(statusMessage.brightness, OffsetDateTime.now(), devicePropertyId, "Brightness");
+      DevicePropertyId dimmingLevelId = new DevicePropertyId(devicePropertyId.deviceId(), "1");
+      dimmingLevelValueUpdateService.setValue(statusMessage.brightness, OffsetDateTime.now(), dimmingLevelId, "Brightness");
     } catch (JsonProcessingException e) {
       log.error("failed to unmarshall status message: {}", message, e);
     }

@@ -78,4 +78,8 @@ public final class ShellyTopicFactory {
     return createTopic(devicePropertyId, propertyTyp) + "/command";
   }
 
+  public static String createSetTopic(DevicePropertyId devicePropertyId, String propertyTyp) {
+    return createTopic(devicePropertyId, propertyTyp) + "/set";
+  }
+
 }
