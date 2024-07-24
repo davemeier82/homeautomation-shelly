@@ -56,18 +56,18 @@ public class ShellyMqttSubscriber implements MqttSubscriber {
 
   @Override
   public void processMessage(String topic, Optional<ByteBuffer> payload) {
-    devicePropertyIdFromTopic(topic).ifPresentOrElse(dpId -> {
-      deviceRepository.getByDeviceId(dpId.deviceId()).orElseGet(() -> {
-        Device newDevice = shellyDeviceFactory.createDevice(dpId.deviceId().type(), dpId.deviceId().id(), dpId.deviceId().toString(), Map.of(), Map.of()).orElseThrow();
+    deviceIdFromTopic(topic).ifPresentOrElse(deviceId -> {
+      deviceRepository.getByDeviceId(deviceId).orElseGet(() -> {
+        Device newDevice = shellyDeviceFactory.createDevice(deviceId.type(), deviceId.id(), deviceId.toString(), Map.of(), Map.of()).orElseThrow();
         deviceRepository.save(newDevice);
         return newDevice;
       });
       String devicePropertyType = ShellyTopicFactory.devicePropertyType(topic).orElseThrow();
-      ShellyDeviceMessageProcessor shellyDeviceMessageProcessor = messageProcessorByType.get((ShellyDeviceType) dpId.deviceId().type());
+      ShellyDeviceMessageProcessor shellyDeviceMessageProcessor = messageProcessorByType.get((ShellyDeviceType) deviceId.type());
       if (shellyDeviceMessageProcessor == null) {
-        log.error("no processor found for devicePropertyId={} and topic={}", dpId, topic);
+        log.error("no processor found for deviceId={} and topic={}", deviceId, topic);
       } else {
-        shellyDeviceMessageProcessor.processMessage(subTopicOf(topic).orElse(null), payload, dpId, devicePropertyType);
+        shellyDeviceMessageProcessor.processMessage(subTopicOf(topic).orElse(null), payload, deviceId, devicePropertyType);
       }
     }, () -> log.info("No devicePropertyId found in topic: {}", topic));
 

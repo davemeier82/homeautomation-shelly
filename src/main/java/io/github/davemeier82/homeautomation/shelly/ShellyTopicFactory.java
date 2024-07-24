@@ -19,6 +19,7 @@ package io.github.davemeier82.homeautomation.shelly;
 import io.github.davemeier82.homeautomation.core.device.DeviceId;
 import io.github.davemeier82.homeautomation.core.device.property.DevicePropertyId;
 import io.github.davemeier82.homeautomation.shelly.device.ShellyDeviceType;
+import org.springframework.util.StringUtils;
 
 import java.util.Optional;
 import java.util.regex.Matcher;
@@ -29,9 +30,10 @@ import static io.github.davemeier82.homeautomation.shelly.device.ShellyDeviceTyp
 public final class ShellyTopicFactory {
 
   public static final String ROOT_TOPIC = "shellies/";
-  private static final Pattern DEVICE_TYPE_PATTERN = Pattern.compile("^" + ROOT_TOPIC + "(\\w*)-(\\w*)/(\\w*)/");
-  private static final Pattern DEVICE_TYPE_PATTERN_WITH_INDEX = Pattern.compile(DEVICE_TYPE_PATTERN + "(\\d*)/(.*)$");
-  private static final Pattern DEVICE_TYPE_PATTERN_WITHOUT_INDEX = Pattern.compile(DEVICE_TYPE_PATTERN + "(\\w*)");
+  private static final Pattern DEVICE_ID_PATTERN = Pattern.compile("^" + ROOT_TOPIC + "(\\w*)-(\\w*)/");
+  private static final Pattern DEVICE_TYPE_PATTERN = Pattern.compile(DEVICE_ID_PATTERN + "(\\w*)/");
+  private static final Pattern SUBTOPIC_PATTERN_WITHOUT_INDEX = Pattern.compile(DEVICE_TYPE_PATTERN + "(\\S*)");
+  private static final Pattern RPC_EVENT_PATTERN = Pattern.compile(DEVICE_ID_PATTERN + "events/rpc/?(\\w*)");
 
   private ShellyTopicFactory() {
   }
@@ -44,18 +46,27 @@ public final class ShellyTopicFactory {
     return Optional.empty();
   }
 
-  public static Optional<DevicePropertyId> devicePropertyIdFromTopic(String topic) {
-    Matcher matcher = DEVICE_TYPE_PATTERN_WITHOUT_INDEX.matcher(topic);
-    if (matcher.find()) {
-      return getByTypeTopicPrefix(matcher.group(1)).map(type -> new DeviceId(matcher.group(2), type)).map(deviceId -> new DevicePropertyId(deviceId, matcher.group(4)));
+  public static Optional<String> devicePropertyIdFromSubTopic(String subTopic) {
+    if (StringUtils.hasLength(subTopic)) {
+      int index = subTopic.indexOf("/");
+      if (index < 0) {
+        return Optional.of(subTopic);
+      }
+      if (index > 0) {
+        return Optional.of(subTopic.substring(0, index));
+      }
     }
     return Optional.empty();
   }
 
   public static Optional<String> subTopicOf(String topic) {
-    Matcher matcher = DEVICE_TYPE_PATTERN_WITH_INDEX.matcher(topic);
+    Matcher rpcMatcher = RPC_EVENT_PATTERN.matcher(topic);
+    if (rpcMatcher.find()) {
+      return Optional.of(rpcMatcher.group(3));
+    }
+    Matcher matcher = SUBTOPIC_PATTERN_WITHOUT_INDEX.matcher(topic);
     if (matcher.find()) {
-      return Optional.of(matcher.group(5));
+      return Optional.of(matcher.group(4));
     }
     return Optional.empty();
   }
@@ -80,6 +91,12 @@ public final class ShellyTopicFactory {
 
   public static String createSetTopic(DevicePropertyId devicePropertyId, String propertyTyp) {
     return createTopic(devicePropertyId, propertyTyp) + "/set";
+  }
+
+  public static String createRpcTopic(DevicePropertyId devicePropertyId) {
+    DeviceId deviceId = devicePropertyId.deviceId();
+    ShellyDeviceType type = (ShellyDeviceType) deviceId.type();
+    return ROOT_TOPIC + type.getTypeTopicPrefix() + deviceId.id() + "/rpc";
   }
 
 }

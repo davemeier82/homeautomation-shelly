@@ -16,14 +16,15 @@
 
 package io.github.davemeier82.homeautomation.shelly;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.davemeier82.homeautomation.core.mqtt.MqttClient;
 import io.github.davemeier82.homeautomation.core.repositories.DeviceRepository;
 import io.github.davemeier82.homeautomation.shelly.device.ShellyDeviceFactory;
 import io.github.davemeier82.homeautomation.shelly.device.ShellyDeviceTypeFactory;
 import io.github.davemeier82.homeautomation.shelly.device.messageprocessor.ShellyDeviceMessageProcessor;
+import io.github.davemeier82.homeautomation.shelly.device.property.controller.ShellyDimmerDevicePropertyController;
 import io.github.davemeier82.homeautomation.shelly.device.property.controller.ShellyRelayDevicePropertyController;
 import io.github.davemeier82.homeautomation.shelly.device.property.controller.ShellyRollerDevicePropertyController;
-import io.github.davemeier82.homeautomation.shelly.device.property.controller.ShellyDimmerDevicePropertyController;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
@@ -71,7 +72,7 @@ public class HomeAutomationShellyAutoConfiguration {
   @Bean
   @ConditionalOnMissingBean
   @ConditionalOnBean(MqttClient.class)
-  ShellyRelayDevicePropertyController shellyRelayDevicePropertyController(MqttClient mqttClient) {
-    return new ShellyRelayDevicePropertyController(mqttClient);
+  ShellyRelayDevicePropertyController shellyRelayDevicePropertyController(MqttClient mqttClient, ObjectMapper objectMapper) {
+    return new ShellyRelayDevicePropertyController(mqttClient, objectMapper);
   }
 }

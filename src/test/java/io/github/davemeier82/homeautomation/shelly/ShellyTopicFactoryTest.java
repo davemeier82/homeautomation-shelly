@@ -17,47 +17,47 @@
 package io.github.davemeier82.homeautomation.shelly;
 
 import io.github.davemeier82.homeautomation.core.device.DeviceId;
-import io.github.davemeier82.homeautomation.core.device.property.DevicePropertyId;
 import org.junit.jupiter.api.Test;
 
 import java.util.Optional;
 
 import static io.github.davemeier82.homeautomation.shelly.ShellyTopicFactory.*;
-import static io.github.davemeier82.homeautomation.shelly.device.ShellyDeviceType.*;
+import static io.github.davemeier82.homeautomation.shelly.device.ShellyDeviceType.SHELLY_HT;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 class ShellyTopicFactoryTest {
 
   @Test
   public void extractDevicePropertyId() {
-    DevicePropertyId devicePropertyId = devicePropertyIdFromTopic("shellies/shellyht-E01234/sensor/temperature").orElseThrow();
-    assertEquals(devicePropertyId, new DevicePropertyId(new DeviceId("E01234", SHELLY_HT), "temperature"));
-    devicePropertyId = devicePropertyIdFromTopic("shellies/shellyht-E01234/relay/0/temperature").orElseThrow();
-    assertEquals(devicePropertyId, new DevicePropertyId(new DeviceId("E01234", SHELLY_HT), "0"));
-    devicePropertyId = devicePropertyIdFromTopic("shellies/shelly1-E01234/relay/0").orElseThrow();
-    assertEquals(devicePropertyId, new DevicePropertyId(new DeviceId("E01234", SHELLY_1), "0"));
-    devicePropertyId = devicePropertyIdFromTopic("shellies/shellyswitch25-E01234/roller/0/pos").orElseThrow();
-    assertEquals(devicePropertyId, new DevicePropertyId(new DeviceId("E01234", SHELLY_25), "0"));
-    devicePropertyId = devicePropertyIdFromTopic("shellies/shellyswitch-E01234/roller/0/pos").orElseThrow();
-    assertEquals(devicePropertyId, new DevicePropertyId(new DeviceId("E01234", SHELLY_2), "0"));
+    String devicePropertyId = devicePropertyIdFromSubTopic(subTopicOf("shellies/shellyht-E01234/sensor/temperature").get()).orElseThrow();
+    assertEquals("temperature", devicePropertyId);
+    devicePropertyId = devicePropertyIdFromSubTopic(subTopicOf("shellies/shellyht-E01234/relay/0/temperature").get()).orElseThrow();
+    assertEquals("0", devicePropertyId);
+    devicePropertyId = devicePropertyIdFromSubTopic(subTopicOf("shellies/shelly1-E01234/relay/0").get()).orElseThrow();
+    assertEquals("0", devicePropertyId);
+    devicePropertyId = devicePropertyIdFromSubTopic(subTopicOf("shellies/shellyswitch25-E01234/roller/0/pos").get()).orElseThrow();
+    assertEquals("0", devicePropertyId);
+    devicePropertyId = devicePropertyIdFromSubTopic(subTopicOf("shellies/shellyswitch-E01234/roller/0/pos").get()).orElseThrow();
+    assertEquals("0", devicePropertyId);
+    assertFalse(devicePropertyIdFromSubTopic(subTopicOf("shellies/shelly1minig3-1234567abcde/events/rpc").get()).isPresent());
   }
 
   @Test
   public void extractDeviceId() {
     DeviceId deviceId = deviceIdFromTopic("shellies/shellyht-E01234/sensor/temperature").orElseThrow();
-    assertEquals(deviceId, new DeviceId("E01234", SHELLY_HT));
-  }
-
-  @Test
-  public void extractEmptySubTopic() {
-    Optional<String> subtopic = subTopicOf("shellies/shellyht-E01234/sensor/temperature");
-    assertTrue(subtopic.isEmpty());
+    assertEquals(new DeviceId("E01234", SHELLY_HT), deviceId);
   }
 
   @Test
   public void extractSubTopic() {
     Optional<String> subtopic = subTopicOf("shellies/shellyht-E01234/relay/0/temperature");
+    assertEquals(Optional.of("0/temperature"), subtopic);
+    subtopic = subTopicOf("shellies/shellyht-E01234/sensor/temperature");
     assertEquals(Optional.of("temperature"), subtopic);
+    subtopic = subTopicOf("shellies/shelly1minig3-1234567abcde/events/rpc");
+    assertEquals(Optional.of(""), subtopic);
+    subtopic = subTopicOf("shellies/shelly1minig3-1234567abcde/events/rpc/response");
+    assertEquals(Optional.of("response"), subtopic);
   }
 }

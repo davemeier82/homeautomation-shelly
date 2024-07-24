@@ -16,6 +16,7 @@
 
 package io.github.davemeier82.homeautomation.shelly.device.messageprocessor;
 
+import io.github.davemeier82.homeautomation.core.device.DeviceId;
 import io.github.davemeier82.homeautomation.core.device.property.DevicePropertyId;
 import io.github.davemeier82.homeautomation.core.updater.BatteryLevelUpdateService;
 import io.github.davemeier82.homeautomation.core.updater.HumidityValueUpdateService;
@@ -28,6 +29,7 @@ import java.nio.ByteBuffer;
 import java.time.OffsetDateTime;
 import java.util.Optional;
 
+import static io.github.davemeier82.homeautomation.shelly.ShellyTopicFactory.devicePropertyIdFromSubTopic;
 import static java.lang.Float.parseFloat;
 import static java.lang.Integer.parseInt;
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -53,8 +55,9 @@ public class ShellyHtMessageProcessor implements ShellyDeviceMessageProcessor {
   }
 
   @Override
-  public void processMessage(String subTopic, Optional<ByteBuffer> payload, DevicePropertyId devicePropertyId, String devicePropertyType) {
+  public void processMessage(String subTopic, Optional<ByteBuffer> payload, DeviceId deviceId, String devicePropertyType) {
     payload.ifPresent(byteBuffer -> {
+      DevicePropertyId devicePropertyId = new DevicePropertyId(deviceId, devicePropertyIdFromSubTopic(subTopic).orElseThrow());
       String message = UTF_8.decode(byteBuffer).toString();
       log.debug("{}: {}", devicePropertyId, message);
       if ("temperature".equals(devicePropertyId.id())) {

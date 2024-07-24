@@ -16,50 +16,65 @@
 
 package io.github.davemeier82.homeautomation.shelly.device.messageprocessor;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.davemeier82.homeautomation.core.device.DeviceId;
 import io.github.davemeier82.homeautomation.core.device.property.DevicePropertyId;
 import io.github.davemeier82.homeautomation.core.updater.RelayStateValueUpdateService;
+import io.github.davemeier82.homeautomation.shelly.ShellyRpc;
 import io.github.davemeier82.homeautomation.shelly.device.ShellyDeviceType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.UncheckedIOException;
 import java.nio.ByteBuffer;
+import java.time.Instant;
 import java.time.OffsetDateTime;
+import java.util.Map;
 import java.util.Optional;
 
-import static io.github.davemeier82.homeautomation.shelly.ShellyTopicFactory.devicePropertyIdFromSubTopic;
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.time.ZoneOffset.UTC;
 
-public class Shelly1MessageProcessor implements ShellyDeviceMessageProcessor {
-  private static final Logger log = LoggerFactory.getLogger(Shelly1MessageProcessor.class);
+public class Shelly1MiniGen3MessageProcessor implements ShellyDeviceMessageProcessor {
+  private static final Logger log = LoggerFactory.getLogger(Shelly1MiniGen3MessageProcessor.class);
   private static final String DISPLAY_NAME = "Relay";
   private final RelayStateValueUpdateService relayStateValueUpdateService;
+  private final ObjectMapper objectMapper;
 
 
-  public Shelly1MessageProcessor(RelayStateValueUpdateService relayStateValueUpdateService) {
+  public Shelly1MiniGen3MessageProcessor(RelayStateValueUpdateService relayStateValueUpdateService, ObjectMapper objectMapper) {
     this.relayStateValueUpdateService = relayStateValueUpdateService;
+    this.objectMapper = objectMapper;
   }
 
   @Override
   public ShellyDeviceType getSupportedDeviceType() {
-    return ShellyDeviceType.SHELLY_1;
+    return ShellyDeviceType.SHELLY_1_MINI_GEN3;
   }
 
   @Override
   public void processMessage(String subTopic, Optional<ByteBuffer> payload, DeviceId deviceId, String devicePropertyType) {
     payload.ifPresent(byteBuffer -> {
-      DevicePropertyId devicePropertyId = new DevicePropertyId(deviceId, devicePropertyIdFromSubTopic(subTopic).orElseThrow());
       String message = UTF_8.decode(byteBuffer).toString();
-      log.debug("{}: {}", devicePropertyId, message);
-      if ("off".equalsIgnoreCase(message)) {
-        updateValue(false, devicePropertyId);
-      } else if ("on".equalsIgnoreCase(message)) {
-        updateValue(true, devicePropertyId);
+      log.debug("{}: {}", deviceId, message);
+      try {
+        ShellyRpc rpcMessage = objectMapper.readValue(message, ShellyRpc.class);
+        if ("NotifyStatus".equals(rpcMessage.method())) {
+          DevicePropertyId devicePropertyId = new DevicePropertyId(deviceId, "0");
+          Map<String, Object> params = (Map<String, Object>) rpcMessage.params().get("switch:0");
+          boolean isOn = (boolean) params.get("output");
+          double timestamp = (double) rpcMessage.params().get("ts");
+          OffsetDateTime offsetDateTime = OffsetDateTime.ofInstant(Instant.ofEpochMilli(Math.round(timestamp * 1000d)), UTC);
+          updateValue(isOn, offsetDateTime, devicePropertyId);
+        }
+      } catch (JsonProcessingException e) {
+        throw new UncheckedIOException(e);
       }
     });
   }
 
-  private void updateValue(boolean isOn, DevicePropertyId devicePropertyId) {
-    relayStateValueUpdateService.setValue(isOn, OffsetDateTime.now(), devicePropertyId, DISPLAY_NAME);
+  private void updateValue(boolean isOn, OffsetDateTime time, DevicePropertyId devicePropertyId) {
+    relayStateValueUpdateService.setValue(isOn, time, devicePropertyId, DISPLAY_NAME);
   }
 }

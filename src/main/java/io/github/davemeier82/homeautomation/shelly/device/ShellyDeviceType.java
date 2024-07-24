@@ -28,7 +28,8 @@ public enum ShellyDeviceType implements DeviceType {
   SHELLY_DIMMER("shellydimmer", "shellydimmer"),
   SHELLY_HT("shellyht", "shellyht"),
   SHELLY_DOOR_WINDOW("shelly-door-window", "shellydw"),
-  SHELLY_DOOR_WINDOW_2("shelly-door-window-2", "shellydw2");
+  SHELLY_DOOR_WINDOW_2("shelly-door-window-2", "shellydw2"),
+  SHELLY_1_MINI_GEN3("shelly1-mini-gen3", "shelly1minig3");
 
   private final String typeName;
   private final String typeTopicPrefix;

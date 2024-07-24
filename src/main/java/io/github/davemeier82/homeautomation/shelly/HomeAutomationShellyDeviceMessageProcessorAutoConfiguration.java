@@ -28,6 +28,7 @@ import io.github.davemeier82.homeautomation.core.updater.TemperatureValueUpdateS
 import io.github.davemeier82.homeautomation.core.updater.WindowStateValueUpdateService;
 import io.github.davemeier82.homeautomation.core.updater.WindowTiltAngleValueUpdateService;
 import io.github.davemeier82.homeautomation.shelly.device.messageprocessor.Shelly1MessageProcessor;
+import io.github.davemeier82.homeautomation.shelly.device.messageprocessor.Shelly1MiniGen3MessageProcessor;
 import io.github.davemeier82.homeautomation.shelly.device.messageprocessor.Shelly25MessageProcessor;
 import io.github.davemeier82.homeautomation.shelly.device.messageprocessor.Shelly2MessageProcessor;
 import io.github.davemeier82.homeautomation.shelly.device.messageprocessor.ShellyDimmerMessageProcessor;
@@ -51,6 +52,13 @@ public class HomeAutomationShellyDeviceMessageProcessorAutoConfiguration {
   @ConditionalOnBean(RelayStateValueUpdateService.class)
   Shelly1MessageProcessor shelly1MessageProcessor(RelayStateValueUpdateService relayStateValueUpdateService) {
     return new Shelly1MessageProcessor(relayStateValueUpdateService);
+  }
+
+  @Bean
+  @ConditionalOnMissingBean
+  @ConditionalOnBean(RelayStateValueUpdateService.class)
+  Shelly1MiniGen3MessageProcessor shelly1MiniGen3MessageProcessor(RelayStateValueUpdateService relayStateValueUpdateService, ObjectMapper objectMapper) {
+    return new Shelly1MiniGen3MessageProcessor(relayStateValueUpdateService, objectMapper);
   }
 
   @Bean

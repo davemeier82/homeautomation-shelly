@@ -14,17 +14,9 @@
  * limitations under the License.
  */
 
-package io.github.davemeier82.homeautomation.shelly.device.messageprocessor;
+package io.github.davemeier82.homeautomation.shelly;
 
-import io.github.davemeier82.homeautomation.core.device.DeviceId;
-import io.github.davemeier82.homeautomation.shelly.device.ShellyDeviceType;
+import java.util.Map;
 
-import java.nio.ByteBuffer;
-import java.util.Optional;
-
-public interface ShellyDeviceMessageProcessor {
-
-  ShellyDeviceType getSupportedDeviceType();
-
-  void processMessage(String subTopic, Optional<ByteBuffer> payload, DeviceId deviceId, String devicePropertyType);
+public record ShellyRpc(String id, String src, String method, Map<String, Object> params) {
 }
