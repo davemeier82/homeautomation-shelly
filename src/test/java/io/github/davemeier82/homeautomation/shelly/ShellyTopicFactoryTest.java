@@ -59,5 +59,14 @@ class ShellyTopicFactoryTest {
     assertEquals(Optional.of(""), subtopic);
     subtopic = subTopicOf("shellies/shelly1minig3-1234567abcde/events/rpc/response");
     assertEquals(Optional.of("response"), subtopic);
+    subtopic = subTopicOf("shellies/shellyswitch-E01234/roller/0/pos");
+    assertEquals(Optional.of("0/pos"), subtopic);
+    subtopic = subTopicOf("shellies/shelly1-22F000/relay/0/command");
+    assertEquals(Optional.of("0/command"), subtopic);
+  }
+
+  @Test
+  public void extractDevicePropertyType() {
+    assertEquals("roller", devicePropertyType("shellies/shellyswitch-E01234/roller/0/pos").get());
   }
 }

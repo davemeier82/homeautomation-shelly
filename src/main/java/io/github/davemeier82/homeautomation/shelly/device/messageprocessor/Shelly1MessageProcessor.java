@@ -51,15 +51,17 @@ public class Shelly1MessageProcessor implements ShellyDeviceMessageProcessor {
       DevicePropertyId devicePropertyId = new DevicePropertyId(deviceId, devicePropertyIdFromSubTopic(subTopic).orElseThrow());
       String message = UTF_8.decode(byteBuffer).toString();
       log.debug("{}: {}", devicePropertyId, message);
-      if ("off".equalsIgnoreCase(message)) {
-        updateValue(false, devicePropertyId);
-      } else if ("on".equalsIgnoreCase(message)) {
-        updateValue(true, devicePropertyId);
+      if (!subTopic.contains("command")) {
+        if ("off".equalsIgnoreCase(message)) {
+          updateValue(false, devicePropertyId);
+        } else if ("on".equalsIgnoreCase(message)) {
+          updateValue(true, devicePropertyId);
+        }
       }
     });
   }
 
   private void updateValue(boolean isOn, DevicePropertyId devicePropertyId) {
-    relayStateValueUpdateService.setValue(isOn, OffsetDateTime.now(), devicePropertyId, DISPLAY_NAME);
+    relayStateValueUpdateService.setValue(isOn, OffsetDateTime.now(), devicePropertyId, devicePropertyId.deviceId().toString() + ": " + DISPLAY_NAME);
   }
 }

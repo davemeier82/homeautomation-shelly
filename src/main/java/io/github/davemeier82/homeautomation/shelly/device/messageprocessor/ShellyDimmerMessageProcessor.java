@@ -73,7 +73,7 @@ public class ShellyDimmerMessageProcessor implements ShellyDeviceMessageProcesso
   }
 
   private void updateRelayValue(boolean isOn, DevicePropertyId devicePropertyId) {
-    relayStateValueUpdateService.setValue(isOn, OffsetDateTime.now(), devicePropertyId, "Relay" + devicePropertyId.id());
+    relayStateValueUpdateService.setValue(isOn, OffsetDateTime.now(), devicePropertyId, devicePropertyId.deviceId().toString() + ": Relay" + devicePropertyId.id());
   }
 
   private void processStatusMessage(String message, DevicePropertyId devicePropertyId) {
@@ -82,7 +82,7 @@ public class ShellyDimmerMessageProcessor implements ShellyDeviceMessageProcesso
       boolean newOnState = statusMessage.ison;
       updateRelayValue(newOnState, devicePropertyId);
       DevicePropertyId dimmingLevelId = new DevicePropertyId(devicePropertyId.deviceId(), "1");
-      dimmingLevelValueUpdateService.setValue(statusMessage.brightness, OffsetDateTime.now(), dimmingLevelId, "Brightness");
+      dimmingLevelValueUpdateService.setValue(statusMessage.brightness, OffsetDateTime.now(), dimmingLevelId, devicePropertyId.deviceId().toString() + ": Brightness");
     } catch (JsonProcessingException e) {
       log.error("failed to unmarshall status message: {}", message, e);
     }

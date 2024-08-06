@@ -85,18 +85,18 @@ public class Shelly2MessageProcessor implements ShellyDeviceMessageProcessor {
   }
 
   private void updateRelayValue(boolean isOn, DevicePropertyId devicePropertyId) {
-    relayStateValueUpdateService.setValue(isOn, OffsetDateTime.now(), devicePropertyId, "Relay" + devicePropertyId.id());
+    relayStateValueUpdateService.setValue(isOn, OffsetDateTime.now(), devicePropertyId, devicePropertyId.deviceId().toString() + ": Relay" + devicePropertyId.id());
   }
 
   private void processRollerMessage(String subTopic, String message, DevicePropertyId devicePropertyId) {
-    if (subTopic == null || subTopic.isEmpty()) {
-      rollerStateValueUpdateService.setValue(rollerStateFrom(message), OffsetDateTime.now(), devicePropertyId, "Roller State");
-    } else if ("pos".equals(subTopic)) {
-      rollerPositionValueUpdateService.setValue(Integer.parseInt(message), OffsetDateTime.now(), devicePropertyId, "Roller Position");
+    if ("0".equals(subTopic)) {
+      rollerStateValueUpdateService.setValue(rollerStateFrom(message), OffsetDateTime.now(), devicePropertyId, devicePropertyId.deviceId().toString() + ": Roller State");
+    } else if ("0/pos".equals(subTopic)) {
+      rollerPositionValueUpdateService.setValue(Integer.parseInt(message), OffsetDateTime.now(), devicePropertyId, devicePropertyId.deviceId().toString() + ": Roller Position");
     }
   }
 
   private void processRelayPowerMessage(String message, DevicePropertyId devicePropertyId) {
-    powerValueUpdateService.setValue(parseDouble(message), OffsetDateTime.now(), devicePropertyId, "Power");
+    powerValueUpdateService.setValue(parseDouble(message), OffsetDateTime.now(), devicePropertyId, devicePropertyId.deviceId().toString() + ": Power");
   }
 }

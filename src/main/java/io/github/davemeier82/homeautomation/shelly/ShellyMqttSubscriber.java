@@ -22,6 +22,7 @@ import io.github.davemeier82.homeautomation.core.repositories.DeviceRepository;
 import io.github.davemeier82.homeautomation.shelly.device.ShellyDeviceFactory;
 import io.github.davemeier82.homeautomation.shelly.device.ShellyDeviceType;
 import io.github.davemeier82.homeautomation.shelly.device.messageprocessor.ShellyDeviceMessageProcessor;
+import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,6 +55,7 @@ public class ShellyMqttSubscriber implements MqttSubscriber {
     return ROOT_TOPIC + "#";
   }
 
+  @Transactional
   @Override
   public void processMessage(String topic, Optional<ByteBuffer> payload) {
     deviceIdFromTopic(topic).ifPresentOrElse(deviceId -> {

@@ -77,6 +77,6 @@ public class Shelly1MiniGen3MessageProcessor implements ShellyDeviceMessageProce
   }
 
   private void updateValue(boolean isOn, OffsetDateTime time, DevicePropertyId devicePropertyId) {
-    relayStateValueUpdateService.setValue(isOn, time, devicePropertyId, DISPLAY_NAME);
+    relayStateValueUpdateService.setValue(isOn, time, devicePropertyId, devicePropertyId.deviceId().toString() + ": " + DISPLAY_NAME);
   }
 }

@@ -62,14 +62,14 @@ public class ShellyDoorWindowMessageProcessor implements ShellyDeviceMessageProc
       log.debug("{}: {}", devicePropertyId, message);
       if ("state".equals(devicePropertyId.id())) {
         if (message.equals("open")) {
-          windowStateValueUpdateService.setValue(true, OffsetDateTime.now(), devicePropertyId, "Window State");
+          windowStateValueUpdateService.setValue(true, OffsetDateTime.now(), devicePropertyId, deviceId.toString() + ": Window State");
         } else if (message.equals("close")) {
-          windowStateValueUpdateService.setValue(false, OffsetDateTime.now(), devicePropertyId, "Window State");
+          windowStateValueUpdateService.setValue(false, OffsetDateTime.now(), devicePropertyId, deviceId.toString() + ": Window State");
         }
       } else if ("battery".equals(devicePropertyId.id())) {
-        batteryLevelUpdateService.setValue(Integer.parseInt(message), OffsetDateTime.now(), devicePropertyId, "Battery Level");
+        batteryLevelUpdateService.setValue(Integer.parseInt(message), OffsetDateTime.now(), devicePropertyId, deviceId.toString() + ": Battery Level");
       } else if ("tilt".equals(devicePropertyId.id())) {
-        windowTiltAngleValueUpdateService.setValue(parseInt(message), OffsetDateTime.now(), devicePropertyId, "Tilt Angle");
+        windowTiltAngleValueUpdateService.setValue(parseInt(message), OffsetDateTime.now(), devicePropertyId, deviceId.toString() + ": Tilt Angle");
       }
     });
   }

@@ -61,11 +61,11 @@ public class ShellyHtMessageProcessor implements ShellyDeviceMessageProcessor {
       String message = UTF_8.decode(byteBuffer).toString();
       log.debug("{}: {}", devicePropertyId, message);
       if ("temperature".equals(devicePropertyId.id())) {
-        temperatureValueUpdateService.setValue(parseFloat(message), OffsetDateTime.now(), devicePropertyId, "Temperature");
+        temperatureValueUpdateService.setValue(parseFloat(message), OffsetDateTime.now(), devicePropertyId, deviceId.toString() + ": Temperature");
       } else if ("humidity".equals(devicePropertyId.id())) {
-        humidityValueUpdateService.setValue(parseFloat(message), OffsetDateTime.now(), devicePropertyId, "Humidity");
+        humidityValueUpdateService.setValue(parseFloat(message), OffsetDateTime.now(), devicePropertyId, deviceId.toString() + ": Humidity");
       } else if ("battery".equals(devicePropertyId.id())) {
-        batteryLevelUpdateService.setValue(parseInt(message), OffsetDateTime.now(), devicePropertyId, "Battery Level");
+        batteryLevelUpdateService.setValue(parseInt(message), OffsetDateTime.now(), devicePropertyId, deviceId.toString() + ": Battery Level");
       }
     });
   }
