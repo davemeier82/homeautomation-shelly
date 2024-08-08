@@ -62,12 +62,15 @@ public class Shelly1MiniGen3MessageProcessor implements ShellyDeviceMessageProce
         ShellyRpc rpcMessage = objectMapper.readValue(message, ShellyRpc.class);
         if ("NotifyStatus".equals(rpcMessage.method())) {
           DevicePropertyId devicePropertyId = new DevicePropertyId(deviceId, "0");
-          Map<String, Object> params = (Map<String, Object>) rpcMessage.params().get("switch:0");
-          Boolean isOn = (Boolean) params.get("output");
-          if (isOn != null) {
-            double timestamp = (double) rpcMessage.params().get("ts");
-            OffsetDateTime offsetDateTime = OffsetDateTime.ofInstant(Instant.ofEpochMilli(Math.round(timestamp * 1000d)), UTC);
-            updateValue(isOn, offsetDateTime, devicePropertyId);
+          Map<String, Object> paramsMap = rpcMessage.params();
+          if (paramsMap != null) {
+            Map<String, Object> params = (Map<String, Object>) paramsMap.get("switch:0");
+            Boolean isOn = (Boolean) params.get("output");
+            if (isOn != null) {
+              double timestamp = (double) paramsMap.get("ts");
+              OffsetDateTime offsetDateTime = OffsetDateTime.ofInstant(Instant.ofEpochMilli(Math.round(timestamp * 1000d)), UTC);
+              updateValue(isOn, offsetDateTime, devicePropertyId);
+            }
           }
         }
       } catch (JsonProcessingException e) {

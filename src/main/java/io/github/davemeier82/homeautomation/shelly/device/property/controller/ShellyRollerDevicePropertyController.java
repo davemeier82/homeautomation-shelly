@@ -24,6 +24,7 @@ import io.github.davemeier82.homeautomation.shelly.ShellyTopicFactory;
 
 import java.util.Set;
 
+import static io.github.davemeier82.homeautomation.shelly.device.ShellyDeviceType.SHELLY_2;
 import static io.github.davemeier82.homeautomation.shelly.device.ShellyDeviceType.SHELLY_25;
 
 public class ShellyRollerDevicePropertyController implements RollerDevicePropertyController {
@@ -40,7 +41,7 @@ public class ShellyRollerDevicePropertyController implements RollerDevicePropert
 
   @Override
   public Set<? extends DeviceType> getSupportedDeviceTypes() {
-    return Set.of(SHELLY_25);
+    return Set.of(SHELLY_25, SHELLY_2);
   }
 
   @Override
