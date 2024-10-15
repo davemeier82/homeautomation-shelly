@@ -32,6 +32,7 @@ import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.time.ZoneOffset.UTC;
@@ -49,8 +50,8 @@ public class Shelly1MiniGen3MessageProcessor implements ShellyDeviceMessageProce
   }
 
   @Override
-  public ShellyDeviceType getSupportedDeviceType() {
-    return ShellyDeviceType.SHELLY_1_MINI_GEN3;
+  public Set<ShellyDeviceType> getSupportedDeviceTypes() {
+    return Set.of(ShellyDeviceType.SHELLY_1_MINI_GEN3);
   }
 
   @Override

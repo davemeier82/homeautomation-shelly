@@ -26,6 +26,7 @@ public enum ShellyDeviceType implements DeviceType {
   SHELLY_2("shelly2", "shellyswitch"),
   SHELLY_25("shelly25", "shellyswitch25"),
   SHELLY_DIMMER("shellydimmer", "shellydimmer"),
+  SHELLY_DIMMER_2("shellydimmer2", "shellydimmer2"),
   SHELLY_HT("shellyht", "shellyht"),
   SHELLY_DOOR_WINDOW("shelly-door-window", "shellydw"),
   SHELLY_DOOR_WINDOW_2("shelly-door-window-2", "shellydw2"),

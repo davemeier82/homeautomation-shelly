@@ -29,6 +29,7 @@ import org.slf4j.LoggerFactory;
 import java.nio.ByteBuffer;
 import java.time.OffsetDateTime;
 import java.util.Optional;
+import java.util.Set;
 
 import static io.github.davemeier82.homeautomation.shelly.ShellyTopicFactory.devicePropertyIdFromSubTopic;
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -46,8 +47,8 @@ public class ShellyDimmerMessageProcessor implements ShellyDeviceMessageProcesso
   }
 
   @Override
-  public ShellyDeviceType getSupportedDeviceType() {
-    return ShellyDeviceType.SHELLY_DIMMER;
+  public Set<ShellyDeviceType> getSupportedDeviceTypes() {
+    return Set.of(ShellyDeviceType.SHELLY_DIMMER_2, ShellyDeviceType.SHELLY_DIMMER);
   }
 
   @Override
@@ -56,7 +57,7 @@ public class ShellyDimmerMessageProcessor implements ShellyDeviceMessageProcesso
       DevicePropertyId devicePropertyId = new DevicePropertyId(deviceId, devicePropertyIdFromSubTopic(subTopic).orElseThrow());
       String message = UTF_8.decode(byteBuffer).toString();
       log.debug("{}: {}", subTopic, message);
-      if ("status".equals(subTopic)) {
+      if (subTopic.endsWith("status")) {
         processStatusMessage(message, devicePropertyId);
       } else if ("light".equals(devicePropertyType)) {
         changeStateOfRelay(devicePropertyId, message);

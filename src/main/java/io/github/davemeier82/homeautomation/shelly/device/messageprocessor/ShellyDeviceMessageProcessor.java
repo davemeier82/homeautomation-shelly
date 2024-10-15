@@ -21,10 +21,11 @@ import io.github.davemeier82.homeautomation.shelly.device.ShellyDeviceType;
 
 import java.nio.ByteBuffer;
 import java.util.Optional;
+import java.util.Set;
 
 public interface ShellyDeviceMessageProcessor {
 
-  ShellyDeviceType getSupportedDeviceType();
+  Set<ShellyDeviceType> getSupportedDeviceTypes();
 
   void processMessage(String subTopic, Optional<ByteBuffer> payload, DeviceId deviceId, String devicePropertyType);
 }

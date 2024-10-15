@@ -44,12 +44,12 @@ public class ShellyRelayDevicePropertyController implements RelayDevicePropertyC
   }
 
   private static String createTopic(DevicePropertyId devicePropertyId) {
-    return createCommandTopic(devicePropertyId, devicePropertyId.deviceId().type() == SHELLY_DIMMER ? "light" : "relay");
+    return createCommandTopic(devicePropertyId, (devicePropertyId.deviceId().type() == SHELLY_DIMMER || devicePropertyId.deviceId().type() == SHELLY_DIMMER_2) ? "light" : "relay");
   }
 
   @Override
   public Set<? extends DeviceType> getSupportedDeviceTypes() {
-    return Set.of(SHELLY_1, SHELLY_2, SHELLY_25, SHELLY_DIMMER, SHELLY_1_MINI_GEN3);
+    return Set.of(SHELLY_1, SHELLY_2, SHELLY_25, SHELLY_DIMMER, SHELLY_DIMMER_2, SHELLY_1_MINI_GEN3);
   }
 
   @Override

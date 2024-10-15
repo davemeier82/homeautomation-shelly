@@ -63,6 +63,8 @@ class ShellyTopicFactoryTest {
     assertEquals(Optional.of("0/pos"), subtopic);
     subtopic = subTopicOf("shellies/shelly1-22F000/relay/0/command");
     assertEquals(Optional.of("0/command"), subtopic);
+    subtopic = subTopicOf("shellies/shellydimmer2-40915156AC0F/light/0/status");
+    assertEquals(Optional.of("0/status"), subtopic);
   }
 
   @Test

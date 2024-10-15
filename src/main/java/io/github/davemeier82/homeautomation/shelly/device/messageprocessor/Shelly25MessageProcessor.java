@@ -29,6 +29,7 @@ import org.slf4j.LoggerFactory;
 import java.nio.ByteBuffer;
 import java.time.OffsetDateTime;
 import java.util.Optional;
+import java.util.Set;
 
 import static io.github.davemeier82.homeautomation.shelly.ShellyTopicFactory.devicePropertyIdFromSubTopic;
 import static io.github.davemeier82.homeautomation.shelly.mapper.RollerStateMapper.rollerStateFrom;
@@ -57,8 +58,8 @@ public class Shelly25MessageProcessor implements ShellyDeviceMessageProcessor {
   }
 
   @Override
-  public ShellyDeviceType getSupportedDeviceType() {
-    return ShellyDeviceType.SHELLY_25;
+  public Set<ShellyDeviceType> getSupportedDeviceTypes() {
+    return Set.of(ShellyDeviceType.SHELLY_25);
   }
 
   @Override

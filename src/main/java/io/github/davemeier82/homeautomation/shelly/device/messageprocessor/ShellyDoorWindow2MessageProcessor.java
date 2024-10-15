@@ -21,6 +21,8 @@ import io.github.davemeier82.homeautomation.core.updater.WindowStateValueUpdateS
 import io.github.davemeier82.homeautomation.core.updater.WindowTiltAngleValueUpdateService;
 import io.github.davemeier82.homeautomation.shelly.device.ShellyDeviceType;
 
+import java.util.Set;
+
 public class ShellyDoorWindow2MessageProcessor extends ShellyDoorWindowMessageProcessor {
   public ShellyDoorWindow2MessageProcessor(WindowStateValueUpdateService windowStateValueUpdateService,
                                            WindowTiltAngleValueUpdateService windowTiltAngleValueUpdateService,
@@ -30,7 +32,7 @@ public class ShellyDoorWindow2MessageProcessor extends ShellyDoorWindowMessagePr
   }
 
   @Override
-  public ShellyDeviceType getSupportedDeviceType() {
-    return ShellyDeviceType.SHELLY_DOOR_WINDOW_2;
+  public Set<ShellyDeviceType> getSupportedDeviceTypes() {
+    return Set.of(ShellyDeviceType.SHELLY_DOOR_WINDOW_2);
   }
 }

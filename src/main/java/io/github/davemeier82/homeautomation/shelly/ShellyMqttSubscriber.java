@@ -22,18 +22,16 @@ import io.github.davemeier82.homeautomation.core.repositories.DeviceRepository;
 import io.github.davemeier82.homeautomation.shelly.device.ShellyDeviceFactory;
 import io.github.davemeier82.homeautomation.shelly.device.ShellyDeviceType;
 import io.github.davemeier82.homeautomation.shelly.device.messageprocessor.ShellyDeviceMessageProcessor;
-import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.nio.ByteBuffer;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.Function;
 
 import static io.github.davemeier82.homeautomation.shelly.ShellyTopicFactory.*;
-import static java.util.stream.Collectors.toMap;
 
 public class ShellyMqttSubscriber implements MqttSubscriber {
 
@@ -41,13 +39,13 @@ public class ShellyMqttSubscriber implements MqttSubscriber {
   private final ShellyDeviceFactory shellyDeviceFactory;
   private final DeviceRepository deviceRepository;
 
-  private final Map<ShellyDeviceType, ShellyDeviceMessageProcessor> messageProcessorByType;
+  private final Map<ShellyDeviceType, ShellyDeviceMessageProcessor> messageProcessorByType = new HashMap<>();
 
 
   public ShellyMqttSubscriber(ShellyDeviceFactory shellyDeviceFactory, DeviceRepository deviceRepository, Set<ShellyDeviceMessageProcessor> shellyDeviceMessageProcessors) {
     this.shellyDeviceFactory = shellyDeviceFactory;
     this.deviceRepository = deviceRepository;
-    messageProcessorByType = shellyDeviceMessageProcessors.stream().collect(toMap(ShellyDeviceMessageProcessor::getSupportedDeviceType, Function.identity()));
+    shellyDeviceMessageProcessors.forEach(processor -> processor.getSupportedDeviceTypes().forEach(type -> messageProcessorByType.put(type, processor)));
   }
 
   @Override
@@ -55,7 +53,6 @@ public class ShellyMqttSubscriber implements MqttSubscriber {
     return ROOT_TOPIC + "#";
   }
 
-  @Transactional
   @Override
   public void processMessage(String topic, Optional<ByteBuffer> payload) {
     deviceIdFromTopic(topic).ifPresentOrElse(deviceId -> {

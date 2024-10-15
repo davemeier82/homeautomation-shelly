@@ -25,6 +25,7 @@ import io.github.davemeier82.homeautomation.shelly.ShellyTopicFactory;
 import java.util.Set;
 
 import static io.github.davemeier82.homeautomation.shelly.device.ShellyDeviceType.SHELLY_DIMMER;
+import static io.github.davemeier82.homeautomation.shelly.device.ShellyDeviceType.SHELLY_DIMMER_2;
 
 
 public class ShellyDimmerDevicePropertyController implements DimmerDevicePropertyController {
@@ -41,7 +42,7 @@ public class ShellyDimmerDevicePropertyController implements DimmerDevicePropert
 
   @Override
   public Set<? extends DeviceType> getSupportedDeviceTypes() {
-    return Set.of(SHELLY_DIMMER);
+    return Set.of(SHELLY_DIMMER, SHELLY_DIMMER_2);
   }
 
   @Override
